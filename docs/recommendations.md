@@ -1,5 +1,7 @@
 # Recommendations
 
+[Русская версия](ru/recommendations.md)
+
 ## Keep Auto Sync Conservative
 
 Scheduled sync should not auto-commit. Use it to fetch, pull clean repos, and push already committed work.

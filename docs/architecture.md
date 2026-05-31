@@ -1,5 +1,7 @@
 # Architecture
 
+[Русская версия](ru/architecture.md)
+
 ## Local Layout
 
 ```text

@@ -1,5 +1,7 @@
 # AI Workspace System
 
+[Русская версия](README.ru.md)
+
 This project defines a portable local workspace for Codex, Claude Code, and GitHub.
 
 It is intentionally generic: machine paths, GitHub organization names, binary paths, and secret-scanning commands belong in local config, not in this repository.
@@ -143,6 +145,7 @@ Connect them with `workspace.yaml`. Agents must ask before copying workbench out
 - [New Machine Setup](docs/new-machine-setup.md)
 - [Project Boundaries](docs/project-boundaries.md)
 - [Recommendations](docs/recommendations.md)
+- [Russian Documentation](docs/ru/README.md)
 
 ## Prompts
 

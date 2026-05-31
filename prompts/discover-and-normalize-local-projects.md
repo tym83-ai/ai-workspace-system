@@ -1,5 +1,7 @@
 # Prompt: Discover And Normalize Local Projects
 
+[Русская версия](ru/discover-and-normalize-local-projects.md)
+
 Use this prompt with Codex or Claude Code when a machine already has scattered local projects and you want to bring them into the AI Workspace System.
 
 ```text

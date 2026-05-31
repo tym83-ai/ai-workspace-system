@@ -1,10 +1,10 @@
-# Prompt: Normalize Existing Project For Codex And Claude
+# Prompt: Нормализовать существующий проект для Codex и Claude
 
-[Русская версия](ru/normalize-existing-project.md)
+[English version](../normalize-existing-project.md)
 
-Normalize the current repository for use with Codex, Claude Code, and GitHub.
+Нормализуй текущий repository для использования с Codex, Claude Code и GitHub.
 
-Tasks:
+Задачи:
 
 1. Inspect project structure.
 2. Identify setup, test, lint, build, and run commands.
@@ -19,7 +19,7 @@ Tasks:
 11. Do not commit secrets or session logs.
 12. Run the narrowest useful verification command.
 
-Final answer:
+Финальный ответ:
 
 - files changed
 - project commands discovered

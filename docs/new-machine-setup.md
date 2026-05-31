@@ -1,5 +1,7 @@
 # New Machine Setup
 
+[Русская версия](ru/new-machine-setup.md)
+
 ## Manual Bootstrap
 
 1. Install `git`, `gh`, Codex, and Claude Code.

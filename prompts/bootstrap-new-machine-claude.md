@@ -1,5 +1,7 @@
 # Claude Code Prompt: Bootstrap AI Workspace On A New Machine
 
+[Русская версия](ru/bootstrap-new-machine-claude.md)
+
 You are Claude Code working on my local machine.
 
 Goal:

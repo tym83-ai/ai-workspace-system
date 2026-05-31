@@ -1,5 +1,7 @@
 # GitHub Organization Plan
 
+[Русская версия](ru/github-organization-plan.md)
+
 Use a dedicated GitHub organization or user account for workspace infrastructure, owned projects, and optional private mirrors.
 
 This value is local configuration. Set it with `workspace-configure`; do not hardcode it in the repository.

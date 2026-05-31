@@ -1,5 +1,7 @@
 # Codex Prompt: Bootstrap AI Workspace On A New Machine
 
+[Русская версия](ru/bootstrap-new-machine-codex.md)
+
 You are Codex working on my local machine.
 
 Goal:

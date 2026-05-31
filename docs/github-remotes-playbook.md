@@ -1,5 +1,7 @@
 # GitHub Remotes Playbook
 
+[Русская версия](ru/github-remotes-playbook.md)
+
 ## New Owned Project
 
 Configure this machine first:

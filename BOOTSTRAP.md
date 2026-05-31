@@ -1,5 +1,7 @@
 # Bootstrap AI Workspace
 
+[Русская версия](BOOTSTRAP.ru.md)
+
 Use this file when setting up a new machine with Codex or Claude Code.
 
 This repository is generic. Before running bootstrap work, provide the agent with:

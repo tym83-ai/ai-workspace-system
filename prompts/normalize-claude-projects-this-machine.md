@@ -1,5 +1,7 @@
 # Claude Code Prompt: Normalize Claude Projects On This Machine
 
+[Русская версия](ru/normalize-claude-projects-this-machine.md)
+
 You are Claude Code working on this machine.
 
 Goal:

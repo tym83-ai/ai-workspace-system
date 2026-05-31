@@ -1,5 +1,7 @@
 # Launcher, Project Discovery, And Global Instructions
 
+[Русская версия](ru/launcher-discovery-and-global-instructions.md)
+
 This document defines the first-run workflow that makes the workspace system useful on real machines.
 
 ## Launcher Workflow

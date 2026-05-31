@@ -1,5 +1,7 @@
 # Project Boundaries
 
+[Русская версия](ru/project-boundaries.md)
+
 Some projects prepare work for another repository. Keep those roles separate.
 
 ## Target Repo
