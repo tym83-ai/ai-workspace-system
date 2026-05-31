@@ -149,3 +149,7 @@ Connect them with `workspace.yaml`. Agents must ask before copying workbench out
 - [Discover And Normalize Local Projects](prompts/discover-and-normalize-local-projects.md) - find scattered local projects, move approved ones into the configured project root, add baseline docs, and initialize Git where appropriate.
 - [Bootstrap New Machine For Codex](prompts/bootstrap-new-machine-codex.md)
 - [Bootstrap New Machine For Claude Code](prompts/bootstrap-new-machine-claude.md)
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE). Per-file Apache headers are in the executable sources under `bin/` and `systemd/`; the repo-level `LICENSE` covers docs, prompts, templates, and config.
