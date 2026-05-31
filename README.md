@@ -84,6 +84,6 @@ Codex reads `AGENTS.md` automatically.
 
 - [Architecture](docs/architecture.md)
 - [GitHub Organization Plan](docs/github-organization-plan.md)
+- [GitHub Remotes Playbook](docs/github-remotes-playbook.md)
 - [New Machine Setup](docs/new-machine-setup.md)
 - [Recommendations](docs/recommendations.md)
-
