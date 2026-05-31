@@ -2,6 +2,8 @@
 
 This project defines the local multi-machine workspace used by Codex, Claude Code, and GitHub.
 
+For new machines, start with [BOOTSTRAP.md](BOOTSTRAP.md).
+
 The goal is simple:
 
 - one canonical local project root: `~/projects`
