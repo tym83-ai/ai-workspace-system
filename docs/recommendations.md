@@ -38,6 +38,18 @@ GitHub sync is not a full backup. Use `restic` or `borg` for:
 - files not committed yet
 - private local data
 
+## Ask Before Changing Upstream Strategy
+
+For repositories whose `origin` is not `tym83-ai`, agents should ask what strategy to use before changing remotes or pushing to upstream.
+
+Default:
+
+- keep `origin` as canonical upstream
+- add `backup` under `tym83-ai`
+- scheduled sync pushes to `backup`
+- upstream PRs/commits happen only after explicit instruction
+- exclude deep nested clones such as pipeline workspaces unless explicitly promoted to a managed project
+
 ## Use Secret Scanning Before Organization Push
 
 Run at least:
@@ -58,4 +70,3 @@ Use:
 - rules/skills for long topic-specific guidance
 
 Large always-loaded instruction files reduce context quality.
-

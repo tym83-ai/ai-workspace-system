@@ -10,6 +10,8 @@ Rules:
 - Do not upload secrets.
 - Do not delete or overwrite local files without explicit approval.
 - Do not force-push.
+- Do not push to external/upstream `origin` remotes unless I explicitly ask.
+- For external/upstream repos, preserve `origin` and add a `backup` remote in `tym83-ai`.
 - Do not auto-commit dirty repositories unless I explicitly ask.
 - Keep Claude-specific state out of Codex repos.
 - Use `AGENTS.md` as the canonical shared project instruction file.
@@ -37,12 +39,14 @@ Tasks:
    - `workspace-new-project`
    - `install-local`
 10. Configure scheduled sync at 13:00, 19:00, and 23:50 via user systemd timer, but ask before enabling it.
-11. Save reports under `~/projects/_reports`.
+11. For site/upstream repos, ask before changing remotes. Default to `origin` as upstream and `backup` as private mirror.
+12. Save reports under `~/projects/_reports`.
 
 Sync behavior:
 
 - `workspace-sync` should fetch and pull clean repos.
-- It should push committed local changes.
+- It should push committed local changes to `origin` only for repos owned by `tym83-ai`.
+- It should push external/upstream repos to `backup`, not `origin`.
 - It should skip dirty repos unless run with `--commit`.
 - It should never force-push.
 - Scheduled sync must run in safe mode and never auto-commit.

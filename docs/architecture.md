@@ -13,7 +13,7 @@
 ```
 
 The launcher can list projects from both `~/projects` and `~/claude`.
-Scheduled sync should start with `~/projects` only and expand deliberately.
+Scheduled sync includes `~/projects`, `~/claude`, and selected legacy paths such as `~/Загрузки/cozyportal-demo`.
 
 ## GitHub Layout
 
@@ -39,8 +39,8 @@ backup   private organization mirror
 Sync policy:
 
 - pull from `origin`
-- push working branches to `origin` only when that is the normal project workflow
-- push backup mirror to `backup` only after checking data policy
+- push committed working branches to `backup` automatically
+- push working branches to `origin` only when explicitly requested for that project
 - never replace `origin` silently
 
 ## Instruction Loading
@@ -67,4 +67,3 @@ Use a user-level systemd timer:
 - 23:50
 
 The scheduled job runs `workspace-sync --scheduled`.
-

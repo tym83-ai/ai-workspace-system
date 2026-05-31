@@ -43,6 +43,8 @@ if [[ -f "$config" ]]; then
 fi
 
 SYNC_ROOTS="${SYNC_ROOTS:-$HOME/projects}"
+GITHUB_ORG="${GITHUB_ORG:-}"
+BACKUP_REMOTE="${BACKUP_REMOTE:-backup}"
 lock_file="${AI_WORKSPACE_SYNC_LOCK:-$HOME/.cache/ai-workspace-sync.lock}"
 log_dir="${AI_WORKSPACE_LOG_DIR:-$HOME/projects/ai-workspace-system/logs}"
 mkdir -p "$(dirname "$lock_file")" "$log_dir"
@@ -69,15 +71,23 @@ discover_repos() {
   for root in "${roots[@]}"; do
     root="$(expand_home "$root")"
     [[ -d "$root" ]] || continue
-    find "$root" -path '*/.git' -type d -prune -print 2>/dev/null | while read -r gitdir; do
+    find "$root" -maxdepth 4 -path '*/.git' -type d -prune -print 2>/dev/null | while read -r gitdir; do
       printf '%s\n' "${gitdir%/.git}"
     done
   done | sort -u
 }
 
+remote_is_org() {
+  local url="$1"
+  local org="$2"
+
+  [[ -n "$org" ]] || return 1
+  [[ "$url" == *"github.com/$org/"* || "$url" == *"github.com:$org/"* ]]
+}
+
 sync_repo() {
   local repo="$1"
-  local branch remote dirty upstream ahead behind
+  local branch remote backup dirty upstream ahead behind upstream_remote
 
   echo
   echo "== $repo"
@@ -92,6 +102,13 @@ sync_repo() {
   if [[ -z "$branch" ]]; then
     echo "skip: detached HEAD or no branch"
     return 0
+  fi
+
+  backup="$(git -C "$repo" remote get-url "$BACKUP_REMOTE" 2>/dev/null || true)"
+  if remote_is_org "$remote" "$GITHUB_ORG"; then
+    upstream_remote="origin"
+  else
+    upstream_remote="$BACKUP_REMOTE"
   fi
 
   dirty="$(git -C "$repo" status --porcelain)"
@@ -119,6 +136,9 @@ sync_repo() {
     else
       echo "skip: dirty worktree"
       git -C "$repo" status --short
+      if [[ "$upstream_remote" = "$BACKUP_REMOTE" && -z "$backup" ]]; then
+        echo "note: external origin; add backup remote before scheduled sync can back this up"
+      fi
       return 0
     fi
   fi
@@ -126,17 +146,25 @@ sync_repo() {
   run git -C "$repo" fetch --prune origin
 
   if ! upstream="$(git -C "$repo" rev-parse --abbrev-ref '@{u}' 2>/dev/null)"; then
-    echo "skip pull/push: no upstream branch"
-    return 0
+    echo "skip pull: no upstream branch"
+  else
+    behind="$(git -C "$repo" rev-list --count "HEAD..$upstream")"
+
+    if [[ "$behind" != "0" ]]; then
+      run git -C "$repo" pull --ff-only
+    else
+      echo "ok: no remote changes"
+    fi
   fi
 
-  behind="$(git -C "$repo" rev-list --count "HEAD..$upstream")"
-  ahead="$(git -C "$repo" rev-list --count "$upstream..HEAD")"
-
-  if [[ "$behind" != "0" ]]; then
-    run git -C "$repo" pull --ff-only
-  else
-    echo "ok: no remote changes"
+  if [[ "$upstream_remote" = "$BACKUP_REMOTE" ]]; then
+    if [[ -z "$backup" ]]; then
+      echo "skip push: external origin and no $BACKUP_REMOTE remote"
+      return 0
+    fi
+    echo "policy: origin is external; pushing committed state to $BACKUP_REMOTE only"
+    run git -C "$repo" push "$BACKUP_REMOTE" "HEAD:refs/heads/$branch"
+    return 0
   fi
 
   ahead="$(git -C "$repo" rev-list --count '@{u}..HEAD' 2>/dev/null || echo 0)"

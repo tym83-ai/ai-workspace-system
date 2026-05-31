@@ -71,3 +71,40 @@ SYNC_ROOTS="$HOME/projects"
 
 Use `PROJECT_ROOTS` to show projects in the picker.
 Add a root to `SYNC_ROOTS` only when you are comfortable with scheduled fetch/pull/push for every repo under it.
+
+Current default:
+
+```text
+PROJECT_ROOTS="$HOME/projects:$HOME/claude:$HOME/Загрузки/cozyportal-demo"
+SYNC_ROOTS="$HOME/projects:$HOME/claude:$HOME/Загрузки/cozyportal-demo"
+```
+
+External `origin` remotes are treated as read-mostly upstreams. `workspace-sync` may fetch/pull from them, but it pushes only to `backup`.
+
+## Create Backup Remotes
+
+For all repositories under `SYNC_ROOTS`:
+
+```bash
+workspace-ensure-backup --push
+```
+
+For one repository:
+
+```bash
+workspace-ensure-backup --push ~/projects/aenix.io
+```
+
+This creates a private repo in `tym83-ai` named:
+
+```text
+mirror-<source-owner>-<source-repo>
+```
+
+and adds it as:
+
+```text
+backup https://github.com/tym83-ai/mirror-<source-owner>-<source-repo>.git
+```
+
+After that, scheduled sync pushes committed local state to `backup`, not to the external `origin`.

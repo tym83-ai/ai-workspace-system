@@ -20,6 +20,7 @@ Important boundaries:
 - Do not auto-commit dirty repositories.
 - Do not upload secrets, `.env`, credentials, tokens, logs, sqlite state, session history, or shell history.
 - Preserve existing remotes. For private organization mirrors, add `backup`, not a replacement `origin`, unless I explicitly approve a transfer.
+- For website/upstream repos, default to `origin` as read-mostly upstream and `backup` as the private `tym83-ai` mirror.
 
 Tasks:
 
@@ -63,6 +64,7 @@ Tasks:
    - Upstream/mirror repos should keep `origin` and optionally get a `backup` remote under `tym83-ai`.
    - Dirty repos should be reported, not auto-committed.
    - Repos with unclear ownership or sensitive data should be marked `needs-review`.
+   - Ask explicitly before pushing to any external `origin`.
 
 7. Do not push until you show me:
    - proposed repo name
@@ -76,4 +78,3 @@ Tasks:
    - projects ready to sync
    - projects that should stay local
    - exact commands for optional next steps
-

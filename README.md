@@ -20,8 +20,9 @@ The goal is simple:
 - `ai-launch claude` - choose a project, then start Claude Code there.
 - `workspace-sync` - pull/push clean repos only.
 - `workspace-sync --commit` - interactively commit dirty repos before syncing.
-- `workspace-sync --scheduled` - safe scheduled mode; never commits automatically.
+- `workspace-sync --scheduled` - safe scheduled mode; never commits automatically and never pushes to external `origin` remotes.
 - `workspace-new-project <name>` - create a new project under `~/projects`.
+- `workspace-ensure-backup --push` - add private `backup` remotes in `tym83-ai` for upstream repos.
 
 ## Project Picker
 
@@ -41,6 +42,7 @@ Automated sync is intentionally conservative:
 - fetches remotes
 - pulls only clean worktrees with upstream branches
 - pushes only committed local changes
+- pushes external/upstream repositories only to their private `backup` remotes
 - skips dirty repos unless `--commit` is used interactively
 - never force-pushes
 - never auto-commits in scheduled mode

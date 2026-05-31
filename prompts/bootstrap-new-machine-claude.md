@@ -56,6 +56,8 @@ Sync design:
 - Dirty repos must be skipped by scheduled sync.
 - Interactive sync may ask before committing dirty repos.
 - Upstream repos should preserve `origin`; private-org mirror should use a separate remote like `backup`.
+- Scheduled sync should push upstream/mirror repos only to `backup`.
+- Pushes to external `origin` remotes require explicit user instruction.
 
 At the end:
 

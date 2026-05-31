@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+push_after=0
+dry_run=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --push) push_after=1; shift ;;
+    --dry-run) dry_run=1; shift ;;
+    --) shift; break ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: workspace-ensure-backup [--push] [--dry-run] [repo...]
+
+Adds a private GitHub backup remote for repos whose origin is outside GITHUB_ORG.
+Backup repo name format: mirror-<source-owner>-<source-repo>
+
+If no repo paths are passed, scans SYNC_ROOTS.
+EOF
+      exit 0
+      ;;
+    *) break ;;
+  esac
+done
+
+config="${AI_WORKSPACE_CONFIG:-$HOME/.config/ai-workspace/config}"
+if [[ -f "$config" ]]; then
+  # shellcheck disable=SC1090
+  source "$config"
+fi
+
+SYNC_ROOTS="${SYNC_ROOTS:-$HOME/projects}"
+GITHUB_ORG="${GITHUB_ORG:-}"
+BACKUP_REMOTE="${BACKUP_REMOTE:-backup}"
+
+if [[ -z "$GITHUB_ORG" ]]; then
+  echo "GITHUB_ORG is not set." >&2
+  exit 1
+fi
+
+run() {
+  printf '+'
+  printf ' %q' "$@"
+  printf '\n'
+  if [[ "$dry_run" = "0" ]]; then
+    "$@"
+  fi
+}
+
+expand_home() {
+  local path="$1"
+  printf '%s\n' "${path/#\~/$HOME}"
+}
+
+discover_repos() {
+  local root
+  IFS=':' read -r -a roots <<< "$SYNC_ROOTS"
+  for root in "${roots[@]}"; do
+    root="$(expand_home "$root")"
+    [[ -d "$root" ]] || continue
+    find "$root" -maxdepth 4 -path '*/.git' -type d -prune -print 2>/dev/null | while read -r gitdir; do
+      printf '%s\n' "${gitdir%/.git}"
+    done
+  done | sort -u
+}
+
+remote_is_org() {
+  local url="$1"
+  [[ "$url" == *"github.com/$GITHUB_ORG/"* || "$url" == *"github.com:$GITHUB_ORG/"* ]]
+}
+
+backup_name_from_origin() {
+  local url="$1"
+  local slug
+
+  slug="$url"
+  slug="${slug#https://github.com/}"
+  slug="${slug#git@github.com:}"
+  slug="${slug%.git}"
+  slug="${slug//\//-}"
+  slug="${slug//./-}"
+  slug="${slug//_/-}"
+  slug="$(printf '%s' "$slug" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-')"
+  printf 'mirror-%s\n' "$slug"
+}
+
+ensure_backup() {
+  local repo="$1"
+  local origin backup branch backup_name backup_url
+
+  [[ -d "$repo/.git" ]] || return 0
+
+  echo
+  echo "== $repo"
+
+  origin="$(git -C "$repo" remote get-url origin 2>/dev/null || true)"
+  if [[ -z "$origin" ]]; then
+    echo "skip: no origin remote"
+    return 0
+  fi
+
+  if remote_is_org "$origin"; then
+    echo "skip: origin already belongs to $GITHUB_ORG"
+    return 0
+  fi
+
+  backup="$(git -C "$repo" remote get-url "$BACKUP_REMOTE" 2>/dev/null || true)"
+  backup_name="$(backup_name_from_origin "$origin")"
+  backup_url="https://github.com/$GITHUB_ORG/$backup_name.git"
+
+  if [[ -z "$backup" ]]; then
+    if ! gh repo view "$GITHUB_ORG/$backup_name" >/dev/null 2>&1; then
+      run gh repo create "$GITHUB_ORG/$backup_name" --private
+    else
+      echo "ok: GitHub repo exists: $GITHUB_ORG/$backup_name"
+    fi
+    run git -C "$repo" remote add "$BACKUP_REMOTE" "$backup_url"
+  else
+    echo "ok: $BACKUP_REMOTE remote already exists: $backup"
+  fi
+
+  if [[ "$push_after" = "1" ]]; then
+    branch="$(git -C "$repo" branch --show-current 2>/dev/null || true)"
+    if [[ -z "$branch" ]]; then
+      echo "skip push: detached HEAD or no branch"
+      return 0
+    fi
+    if ! run git -C "$repo" push "$BACKUP_REMOTE" "HEAD:refs/heads/$branch"; then
+      echo "warn: backup push failed for $repo"
+      return 0
+    fi
+  fi
+}
+
+if [[ $# -gt 0 ]]; then
+  repos=("$@")
+else
+  mapfile -t repos < <(discover_repos)
+fi
+
+for repo in "${repos[@]}"; do
+  ensure_backup "$(expand_home "$repo")"
+done
