@@ -13,7 +13,7 @@
 
    ```bash
    mkdir -p ~/projects
-   git clone git@github.com:<org>/ai-workspace-system.git ~/projects/ai-workspace-system
+   git clone git@github.com:tym83-ai/ai-workspace-system.git ~/projects/ai-workspace-system
    ```
 
 4. Install scripts:
@@ -52,4 +52,3 @@ alias claude='ai-launch claude'
 ```
 
 Do not add aliases until you are comfortable that the launcher works.
-

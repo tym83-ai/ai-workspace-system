@@ -18,7 +18,7 @@ Rules:
 GitHub organization:
 
 ```text
-<ORG_URL>
+https://github.com/tym83-ai
 ```
 
 Tasks:
@@ -53,4 +53,3 @@ Final answer:
 - List skipped or risky directories.
 - List created scripts and docs.
 - Report sync status and remaining manual steps.
-

@@ -5,7 +5,7 @@
 Use the workspace helper:
 
 ```bash
-GITHUB_ORG=<org> workspace-new-project my-project
+GITHUB_ORG=tym83-ai workspace-new-project my-project
 ```
 
 This creates:
@@ -20,7 +20,7 @@ This creates:
 From inside the project:
 
 ```bash
-gh repo create <org>/<repo-name> --private --source=. --remote=origin --push
+gh repo create tym83-ai/<repo-name> --private --source=. --remote=origin --push
 ```
 
 Before running this:
@@ -50,7 +50,7 @@ For projects like website mirrors, vendor repos, customer repos, or upstream-own
 
 ```bash
 git remote -v
-git remote add backup git@github.com:<org>/<repo-name>-mirror.git
+git remote add backup git@github.com:tym83-ai/<repo-name>-mirror.git
 ```
 
 Policy:
@@ -71,4 +71,3 @@ SYNC_ROOTS="$HOME/projects"
 
 Use `PROJECT_ROOTS` to show projects in the picker.
 Add a root to `SYNC_ROOTS` only when you are comfortable with scheduled fetch/pull/push for every repo under it.
-

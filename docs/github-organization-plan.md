@@ -1,6 +1,6 @@
 # GitHub Organization Plan
 
-Use a dedicated private GitHub organization for workspace infrastructure and local projects.
+Use the dedicated private GitHub organization `tym83-ai` for workspace infrastructure and local projects.
 
 ## Repository Classes
 
@@ -45,4 +45,3 @@ Before mirroring, classify the repo:
 - too large for Git without LFS
 
 Only mirror repos that are safe for the private organization.
-

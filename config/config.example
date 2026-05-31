@@ -1,6 +1,5 @@
 PROJECT_ROOTS="$HOME/projects:$HOME/claude"
 SYNC_ROOTS="$HOME/projects"
-GITHUB_ORG=""
+GITHUB_ORG="tym83-ai"
 CODEX_BIN="$HOME/.local/bin/codex"
 CLAUDE_BIN="$HOME/.local/bin/claude"
-

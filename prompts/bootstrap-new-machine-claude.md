@@ -14,7 +14,7 @@ Read and follow:
 GitHub organization:
 
 ```text
-<ORG_URL>
+https://github.com/tym83-ai
 ```
 
 Tasks:
@@ -62,4 +62,3 @@ At the end:
 - Save an inventory report.
 - Save a final report.
 - Tell me exactly what was changed and what still needs manual review.
-
