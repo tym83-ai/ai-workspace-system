@@ -18,6 +18,7 @@ Rules:
 - Use `CLAUDE.md` as a Claude bridge that imports `@AGENTS.md`.
 - Separate target repositories from delivery workbenches.
 - Use `workspace.yaml` to connect workbenches to target repositories.
+- Do not overwrite global agent files. Preserve existing `~/.codex/AGENTS.md`, `~/.claude/CLAUDE.md`, and `~/.claude/rules/`; propose additive changes instead.
 
 Before changing GitHub remotes, ask for or read local configuration:
 
@@ -46,6 +47,7 @@ Tasks:
 12. For site/upstream repos, ask before changing remotes. Default to `origin` as upstream and `backup` as private mirror.
 13. Keep prompts, research, raw inputs, generated drafts, and local pipeline state in workbench repos, not target repos.
 14. Save reports under `~/projects/_reports`.
+15. Use `prompts/discover-and-normalize-local-projects.md` as the detailed workflow for existing scattered local projects.
 
 Sync behavior:
 

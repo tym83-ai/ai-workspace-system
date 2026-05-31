@@ -23,6 +23,7 @@ Rules:
 - Do not push to external/upstream origin remotes unless I explicitly ask.
 - For external/upstream repos, preserve origin and use backup only after confirming the strategy.
 - Keep target repos separate from delivery workbenches.
+- Do not overwrite global agent files. If ~/.codex/AGENTS.md, ~/.claude/CLAUDE.md, or ~/.claude/rules already exist, preserve them and propose additive changes only.
 
 Tasks:
 1. Inventory likely projects under my home directory and configured PROJECT_ROOTS.
@@ -54,6 +55,7 @@ Tasks:
 10. For existing Git repos, preserve remotes and branches. Do not rewrite history.
 11. For dirty repos, report status and ask before committing.
 12. Run the narrowest useful verification command for changed projects.
+13. For global agent files, create missing files only after approval. For existing files, report recommended additions instead of replacing the file.
 
 Final answer:
 - projects moved

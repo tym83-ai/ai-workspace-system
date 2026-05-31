@@ -11,6 +11,7 @@ Read and follow:
 - `AGENTS.md` files for shared project instructions.
 - If both exist, do not duplicate large rule sets; make `CLAUDE.md` import `@AGENTS.md`.
 - `workspace.yaml` files for workbenches that prepare output for target repositories.
+- Preserve existing global agent files. Do not replace `~/.claude/CLAUDE.md`, `~/.claude/rules/`, or `~/.codex/AGENTS.md`; propose additive changes instead.
 
 Before changing GitHub remotes, ask for or read local configuration:
 
@@ -54,7 +55,8 @@ Tasks:
    - `~/.claude/CLAUDE.md`
    - `~/.claude/rules/`
    - `~/.codex/AGENTS.md`
-9. Do not enable scheduled sync until I approve.
+9. Use `prompts/discover-and-normalize-local-projects.md` as the detailed workflow for existing scattered local projects.
+10. Do not enable scheduled sync until I approve.
 
 Sync design:
 

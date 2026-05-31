@@ -55,6 +55,10 @@ alias claude='ai-launch claude'
 
 Do not add aliases until you are comfortable that the launcher works.
 
+The launcher shows `New project`, `No project`, then discovered projects.
+`New project` creates a Git repository with baseline docs and an initial commit.
+`No project` starts from `$HOME` for one-off tasks.
+
 ## Normalize Existing Local Projects
 
 If the machine already has scattered projects, give the agent:
@@ -64,3 +68,11 @@ If the machine already has scattered projects, give the agent:
 ```
 
 That prompt inventories local directories, proposes a move plan into the configured project root, adds baseline docs/instructions, and initializes Git repositories only for real projects.
+
+## Global Agent Files
+
+Global Codex and Claude files should be preserved.
+If they are missing, agents may propose creating them.
+If they already exist, agents should read them and apply only additive changes after approval.
+
+Do not move or commit global runtime state, sessions, auth files, logs, sqlite state, shell history, or local machine secrets.

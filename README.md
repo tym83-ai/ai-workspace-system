@@ -16,6 +16,7 @@ For new machines, start with [BOOTSTRAP.md](BOOTSTRAP.md).
 - shared global and project-level instructions
 - reusable bootstrap prompts for new machines
 - optional syncing of reusable agent assets through a configured GitHub organization or user account
+- a first-run prompt for discovering scattered local projects and normalizing them into the workspace
 
 ## Commands
 
@@ -39,7 +40,29 @@ Then it lists discovered projects from configured roots.
 
 Directories with `.git`, `workspace.yaml`, `AGENTS.md`, `CLAUDE.md`, `README.md`, or common package files are treated as projects.
 
+`New project` initializes a real Git repository with baseline docs and an initial commit.
+
 `No project` starts the agent from `$HOME`, useful for one-off questions or work that does not need repository context.
+
+## Existing Local Projects
+
+For machines that already contain scattered projects, use:
+
+```text
+prompts/discover-and-normalize-local-projects.md
+```
+
+That prompt inventories local directories, proposes a move plan into the configured project root, adds baseline project and agent docs, and initializes Git only for real projects.
+
+## Global Agent Files
+
+The system treats global agent files as machine-level preferences:
+
+- `~/.codex/AGENTS.md`
+- `~/.claude/CLAUDE.md`
+- `~/.claude/rules/*.md`
+
+Agents should not overwrite these files. If they already exist, preserve them and propose or apply additive changes only after approval.
 
 ## Sync Policy
 
@@ -116,6 +139,7 @@ Connect them with `workspace.yaml`. Agents must ask before copying workbench out
 - [Architecture](docs/architecture.md)
 - [GitHub Organization Plan](docs/github-organization-plan.md)
 - [GitHub Remotes Playbook](docs/github-remotes-playbook.md)
+- [Launcher, Project Discovery, And Global Instructions](docs/launcher-discovery-and-global-instructions.md)
 - [New Machine Setup](docs/new-machine-setup.md)
 - [Project Boundaries](docs/project-boundaries.md)
 - [Recommendations](docs/recommendations.md)
