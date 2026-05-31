@@ -54,3 +54,13 @@ alias claude='ai-launch claude'
 ```
 
 Do not add aliases until you are comfortable that the launcher works.
+
+## Normalize Existing Local Projects
+
+If the machine already has scattered projects, give the agent:
+
+```text
+~/projects/ai-workspace-system/prompts/discover-and-normalize-local-projects.md
+```
+
+That prompt inventories local directories, proposes a move plan into the configured project root, adds baseline docs/instructions, and initializes Git repositories only for real projects.

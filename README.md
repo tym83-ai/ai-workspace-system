@@ -119,3 +119,9 @@ Connect them with `workspace.yaml`. Agents must ask before copying workbench out
 - [New Machine Setup](docs/new-machine-setup.md)
 - [Project Boundaries](docs/project-boundaries.md)
 - [Recommendations](docs/recommendations.md)
+
+## Prompts
+
+- [Discover And Normalize Local Projects](prompts/discover-and-normalize-local-projects.md) - find scattered local projects, move approved ones into the configured project root, add baseline docs, and initialize Git where appropriate.
+- [Bootstrap New Machine For Codex](prompts/bootstrap-new-machine-codex.md)
+- [Bootstrap New Machine For Claude Code](prompts/bootstrap-new-machine-claude.md)

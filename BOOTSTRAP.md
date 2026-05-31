@@ -27,6 +27,7 @@ First clone the workspace system into:
 
 Then read:
 ~/projects/ai-workspace-system/docs/new-machine-setup.md
+~/projects/ai-workspace-system/prompts/discover-and-normalize-local-projects.md
 ~/projects/ai-workspace-system/prompts/bootstrap-new-machine-codex.md
 ~/projects/ai-workspace-system/prompts/bootstrap-new-machine-claude.md
 
