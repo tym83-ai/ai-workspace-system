@@ -1,4 +1,4 @@
-PROJECT_ROOTS="$HOME/projects:$HOME/claude:$HOME/Загрузки/cozyportal-demo"
+PROJECT_ROOTS="$HOME/repos:$HOME/projects:$HOME/claude"
 SYNC_ROOTS="$HOME/projects:$HOME/claude:$HOME/Загрузки/cozyportal-demo"
 GITHUB_ORG="tym83-ai"
 BACKUP_REMOTE="backup"

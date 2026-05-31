@@ -17,6 +17,13 @@ This repository owns the local project launcher, sync workflow, bootstrap prompt
 - Do not change existing project remotes silently.
 - For mirror/upstream repos, preserve upstream remotes and add organization remotes explicitly.
 
+## Repo Layout & Sync Scope
+
+- `~/repos` — external / upstream / mirror clones (origin outside `tym83-ai`). Discovery-first via `PROJECT_ROOTS`, but **never** auto-synced or mirrored to the org.
+- `~/projects` — `tym83-ai`-owned projects and local owned work. This is the only `SYNC_ROOTS` entry; scheduled sync pushes committed work to each repo's own origin.
+- `PROJECT_ROOTS="$HOME/repos:$HOME/projects:$HOME/claude"` (repos searched first). `SYNC_ROOTS="$HOME/projects"`.
+- Org mirroring of external repos is **disabled by policy** (do not run `workspace-ensure-backup` over external clones; keep them in `~/repos`).
+
 ## Instruction Conventions
 
 - `AGENTS.md` is the canonical shared project instruction file.
