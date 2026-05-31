@@ -10,6 +10,7 @@ Read and follow:
 - `CLAUDE.md` files for Claude-specific instructions.
 - `AGENTS.md` files for shared project instructions.
 - If both exist, do not duplicate large rule sets; make `CLAUDE.md` import `@AGENTS.md`.
+- `workspace.yaml` files for workbenches that prepare output for target repositories.
 
 GitHub organization:
 
@@ -22,6 +23,10 @@ Tasks:
 1. Inventory likely projects in my home directory.
 2. Classify projects as:
    - owned project
+   - target repo
+   - delivery workbench
+   - research workbench
+   - integration workbench
    - upstream/mirror repo
    - website/content repo
    - Codex asset
@@ -36,6 +41,7 @@ Tasks:
    - `README.md`
    - `AGENTS.md`
    - `CLAUDE.md`
+   - `workspace.yaml` when it has targets or is a workbench
    - `.gitignore`
    - `.env.example` when appropriate
 7. Create or update `~/projects/ai-workspace-system` with:
@@ -58,6 +64,8 @@ Sync design:
 - Upstream repos should preserve `origin`; private-org mirror should use a separate remote like `backup`.
 - Scheduled sync should push upstream/mirror repos only to `backup`.
 - Pushes to external `origin` remotes require explicit user instruction.
+- Target repos should contain reviewed code/content/docs only.
+- Delivery workbenches should contain prompts, research, briefs, raw inputs, generated drafts, and local pipeline state.
 
 At the end:
 

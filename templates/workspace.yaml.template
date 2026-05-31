@@ -1,0 +1,22 @@
+name: <project-name>
+type: target-repo | delivery-workbench | research-workbench | integration-workbench
+owner: tym83-ai
+
+targets:
+  - name: <target-name>
+    path: ~/projects/<target-repo>
+    origin: https://github.com/<owner>/<repo>.git
+    backup: https://github.com/tym83-ai/<mirror-repo>.git
+    publish_policy: explicit
+    role: <what this target owns>
+
+boundaries:
+  workbench_owns:
+    - prompts
+    - research
+    - briefs
+    - generated drafts before review
+  target_owns:
+    - reviewed code or content
+    - public docs
+    - upstream PR branches

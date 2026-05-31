@@ -4,6 +4,15 @@
 
 Describe what this project is and who uses it.
 
+## Project Type
+
+Choose one:
+
+- `target-repo`: reviewed code/content/public docs live here.
+- `delivery-workbench`: prompts, research, briefs, drafts, pipeline state, and agent assets live here.
+
+If this project prepares changes for another repository, add `workspace.yaml` and keep the target repo clean.
+
 ## Setup
 
 Add install/setup commands here when known.
@@ -26,4 +35,5 @@ Add install/setup commands here when known.
 
 - Preserve existing remotes unless explicitly asked to change them.
 - Do not force-push.
-
+- For external/upstream repos, preserve `origin` and use `backup` for the private mirror.
+- Ask before pushing to any external upstream `origin`.

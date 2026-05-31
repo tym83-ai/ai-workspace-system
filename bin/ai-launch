@@ -54,7 +54,7 @@ is_project_dir() {
   [[ "$base" == _reports ]] && return 1
   [[ "$base" == _artifacts ]] && return 1
 
-  [[ -d "$dir/.git" || -f "$dir/AGENTS.md" || -f "$dir/CLAUDE.md" || -f "$dir/README.md" || -f "$dir/package.json" || -f "$dir/pyproject.toml" || -f "$dir/go.mod" ]]
+  [[ -d "$dir/.git" || -f "$dir/workspace.yaml" || -f "$dir/AGENTS.md" || -f "$dir/CLAUDE.md" || -f "$dir/README.md" || -f "$dir/package.json" || -f "$dir/pyproject.toml" || -f "$dir/go.mod" ]]
 }
 
 discover_projects() {

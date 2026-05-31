@@ -7,13 +7,24 @@
   ai-workspace-system/   # this project
   _codex/                # reusable Codex assets
   _artifacts/            # supporting materials, not source repos
-  <project>/             # real projects and repo mirrors
+  <project>/             # real projects, repo mirrors, and delivery workbenches
 
 ~/claude/                # optional legacy Claude project root
 ```
 
 The launcher can list projects from both `~/projects` and `~/claude`.
-Scheduled sync includes `~/projects`, `~/claude`, and selected legacy paths such as `~/Загрузки/cozyportal-demo`.
+Scheduled sync includes configured roots such as `~/projects` and `~/claude`.
+
+## Project Types
+
+Target repositories and delivery workbenches are separate:
+
+```text
+target repo          reviewed code/site/docs intended for a real repository
+delivery workbench   prompts, research, briefs, raw inputs, generated drafts, pipeline state
+```
+
+Use `workspace.yaml` to connect a workbench to its targets. A target repo should not contain private prompts, local session logs, raw generation pipelines, or agent runtime state.
 
 ## GitHub Layout
 

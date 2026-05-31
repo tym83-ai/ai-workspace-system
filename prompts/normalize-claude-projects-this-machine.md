@@ -21,6 +21,7 @@ Important boundaries:
 - Do not upload secrets, `.env`, credentials, tokens, logs, sqlite state, session history, or shell history.
 - Preserve existing remotes. For private organization mirrors, add `backup`, not a replacement `origin`, unless I explicitly approve a transfer.
 - For website/upstream repos, default to `origin` as read-mostly upstream and `backup` as the private `tym83-ai` mirror.
+- Separate target repositories from delivery workbenches. Do not keep private prompts, raw pipeline state, or session logs inside target repos.
 
 Tasks:
 
@@ -39,6 +40,8 @@ Tasks:
    - whether it has `CLAUDE.md`
    - whether it has `.claude/`
    - whether it looks like an upstream/mirror repo
+   - whether it is a target repo, delivery workbench, research workbench, or integration workbench
+   - whether it needs `workspace.yaml`
    - sync recommendation
    - risks or secrets-looking files, without printing secret values
 
@@ -53,6 +56,7 @@ Tasks:
    - If `CLAUDE.md` is missing, create one that imports `@AGENTS.md`.
    - If `CLAUDE.md` already exists and is substantial, do not replace it. Add a short reference to `AGENTS.md` only if safe.
    - Keep project-specific rules intact.
+   - Add `workspace.yaml` for workbenches and mixed directories that prepare output for target repos.
 
 5. Normalize docs:
    - If `README.md` is missing, create a minimal one with project purpose, setup, common commands, and sync notes.
@@ -65,6 +69,7 @@ Tasks:
    - Dirty repos should be reported, not auto-committed.
    - Repos with unclear ownership or sensitive data should be marked `needs-review`.
    - Ask explicitly before pushing to any external `origin`.
+   - Move obvious prompts/research/drafts/session logs out of target repos into a workbench before syncing, when it is safe.
 
 7. Do not push until you show me:
    - proposed repo name

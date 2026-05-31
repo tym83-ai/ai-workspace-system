@@ -45,6 +45,15 @@ cat > AGENTS.md <<EOF
 
 Add the project purpose here.
 
+## Project Type
+
+Choose one:
+
+- `target-repo`: reviewed code/content/public docs live here.
+- `delivery-workbench`: prompts, research, briefs, drafts, pipeline state, and agent assets live here.
+
+If this project prepares changes for another repository, keep that relationship in `workspace.yaml`.
+
 ## Common Commands
 
 - Test:
@@ -58,6 +67,20 @@ Add the project purpose here.
 - Keep secrets out of Git.
 - Do not commit generated caches, dependency directories, logs, local databases, or agent session state.
 - Run the narrowest useful verification command after code changes.
+EOF
+
+cat > workspace.yaml <<EOF
+name: $name
+type: target-repo
+owner: ${org:-}
+
+targets: []
+
+boundaries:
+  workbench_owns: []
+  target_owns:
+    - reviewed code or content
+    - public docs
 EOF
 
 cat > CLAUDE.md <<'EOF'
@@ -91,7 +114,7 @@ EOF
 
 touch .env.example
 git init -b main
-git add README.md AGENTS.md CLAUDE.md .gitignore .env.example
+git add README.md AGENTS.md CLAUDE.md workspace.yaml .gitignore .env.example
 git commit -m "Initial project scaffold"
 
 if [[ -n "$org" ]]; then
