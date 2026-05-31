@@ -90,7 +90,7 @@ CLAUDE.local.md
 EOF
 
 touch .env.example
-git init
+git init -b main
 git add README.md AGENTS.md CLAUDE.md .gitignore .env.example
 git commit -m "Initial project scaffold"
 
@@ -105,4 +105,3 @@ else
 fi
 
 printf '%s\n' "$dir"
-
