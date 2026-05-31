@@ -97,14 +97,16 @@ launch_agent() {
 }
 
 new_project() {
-  local new_name
+  local new_name new_output new_dir
   read -r -p "Project name: " new_name
   if [[ -z "$new_name" ]]; then
     echo "No project name provided." >&2
     exit 1
   fi
-  workspace-new-project "$new_name"
-  launch_agent "$HOME/projects/$new_name" "$@"
+  new_output="$(workspace-new-project "$new_name")"
+  printf '%s\n' "$new_output"
+  new_dir="$(printf '%s\n' "$new_output" | tail -n 1)"
+  launch_agent "$new_dir" "$@"
 }
 
 mapfile -t projects < <(discover_projects)

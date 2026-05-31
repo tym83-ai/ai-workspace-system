@@ -4,10 +4,10 @@ This repository owns the local project launcher, sync workflow, bootstrap prompt
 
 ## Goals
 
-- Keep all local projects discoverable from `~/projects`.
+- Keep local projects discoverable from configured project roots.
 - Support both Codex and Claude Code without duplicating instructions.
 - Keep automatic sync safe by default.
-- Keep reusable prompts, scripts, and docs versioned in a private GitHub organization.
+- Keep reusable prompts, scripts, and docs versioned without machine-specific values.
 
 ## Safety Rules
 
@@ -16,13 +16,14 @@ This repository owns the local project launcher, sync workflow, bootstrap prompt
 - Do not force-push.
 - Do not change existing project remotes silently.
 - For mirror/upstream repos, preserve upstream remotes and add organization remotes explicitly.
+- Do not hardcode a maintainer's home path, GitHub organization, project names, or private helper scripts in this repository.
 
-## Repo Layout & Sync Scope
+## Configuration Rules
 
-- `~/repos` — external / upstream / mirror clones (origin outside `tym83-ai`). Discovery-first via `PROJECT_ROOTS`, but **never** auto-synced or mirrored to the org.
-- `~/projects` — `tym83-ai`-owned projects and local owned work. This is the only `SYNC_ROOTS` entry; scheduled sync pushes committed work to each repo's own origin.
-- `PROJECT_ROOTS="$HOME/repos:$HOME/projects:$HOME/claude"` (repos searched first). `SYNC_ROOTS="$HOME/projects"`.
-- Org mirroring of external repos is **disabled by policy** (do not run `workspace-ensure-backup` over external clones; keep them in `~/repos`).
+- Local machine config lives in `~/.config/ai-workspace/config`.
+- `config/config.example` must stay generic and safe to publish.
+- Use `workspace-configure` to collect machine-specific values interactively.
+- Keep generated logs under `$XDG_STATE_HOME` or `~/.local/state`, not inside this repository.
 
 ## Instruction Conventions
 
@@ -35,5 +36,5 @@ This repository owns the local project launcher, sync workflow, bootstrap prompt
 
 - Run `bash -n bin/*` after editing shell scripts.
 - Run `workspace-sync --dry-run` after changing sync logic.
+- Search for personal values before publishing.
 - Keep docs and templates aligned with script behavior.
-

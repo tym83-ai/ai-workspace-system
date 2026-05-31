@@ -13,7 +13,20 @@ if [[ -f "$config" ]]; then
   source "$config"
 fi
 
-root="${PROJECTS_HOME:-$HOME/projects}"
+expand_home() {
+  local path="$1"
+  printf '%s\n' "${path/#\~/$HOME}"
+}
+
+if [[ -n "${PROJECTS_HOME:-}" ]]; then
+  root="$(expand_home "$PROJECTS_HOME")"
+elif [[ -n "${PROJECT_ROOTS:-}" ]]; then
+  IFS=':' read -r root _ <<< "$PROJECT_ROOTS"
+  root="$(expand_home "$root")"
+else
+  root="$HOME/projects"
+fi
+
 org="${GITHUB_ORG:-}"
 dir="$root/$name"
 

@@ -8,9 +8,8 @@ Normalize the Claude project workspace so all Claude-managed and mixed projects 
 Local context:
 
 - Canonical mixed workspace: `~/projects`
-- Claude legacy workspace: `~/claude`
 - Workspace system: `~/projects/ai-workspace-system`
-- GitHub organization: `https://github.com/tym83-ai`
+- Machine-specific config: `~/.config/ai-workspace/config`
 
 Important boundaries:
 
@@ -20,13 +19,12 @@ Important boundaries:
 - Do not auto-commit dirty repositories.
 - Do not upload secrets, `.env`, credentials, tokens, logs, sqlite state, session history, or shell history.
 - Preserve existing remotes. For private organization mirrors, add `backup`, not a replacement `origin`, unless I explicitly approve a transfer.
-- For website/upstream repos, default to `origin` as read-mostly upstream and `backup` as the private `tym83-ai` mirror.
+- For website/upstream repos, default to `origin` as read-mostly upstream and `backup` as the private mirror under the configured GitHub org/account.
 - Separate target repositories from delivery workbenches. Do not keep private prompts, raw pipeline state, or session logs inside target repos.
 
 Tasks:
 
 1. Inventory Claude projects under:
-   - `~/claude`
    - `~/projects`
    - any existing project roots listed in `~/.config/ai-workspace/config`
 
@@ -64,8 +62,8 @@ Tasks:
    - Add `.env.example` only when the project clearly uses env vars.
 
 6. GitHub sync strategy:
-   - Owned clean projects can be prepared for `tym83-ai`.
-   - Upstream/mirror repos should keep `origin` and optionally get a `backup` remote under `tym83-ai`.
+   - Owned clean projects can be prepared for the configured `GITHUB_ORG`.
+   - Upstream/mirror repos should keep `origin` and optionally get a `backup` remote under the configured `GITHUB_ORG`.
    - Dirty repos should be reported, not auto-committed.
    - Repos with unclear ownership or sensitive data should be marked `needs-review`.
    - Ask explicitly before pushing to any external `origin`.

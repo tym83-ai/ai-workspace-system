@@ -13,7 +13,7 @@
 
    ```bash
    mkdir -p ~/projects
-   git clone git@github.com:tym83-ai/ai-workspace-system.git ~/projects/ai-workspace-system
+   git clone <ai-workspace-system-repo-url> ~/projects/ai-workspace-system
    ```
 
 4. Install scripts:
@@ -22,15 +22,17 @@
    ~/projects/ai-workspace-system/bin/install-local
    ```
 
-5. Review config:
+5. Configure this machine:
 
    ```bash
+   workspace-configure
    sed -n '1,120p' ~/.config/ai-workspace/config
    ```
 
-6. Enable scheduled sync:
+6. Enable scheduled sync only after reviewing config and dry-run output:
 
    ```bash
+   workspace-sync --dry-run
    systemctl --user daemon-reload
    systemctl --user enable --now ai-workspace-sync.timer
    ```

@@ -1,29 +1,32 @@
 # AI Workspace System
 
-This project defines the local multi-machine workspace used by Codex, Claude Code, and GitHub.
+This project defines a portable local workspace for Codex, Claude Code, and GitHub.
+
+It is intentionally generic: machine paths, GitHub organization names, binary paths, and secret-scanning commands belong in local config, not in this repository.
 
 For new machines, start with [BOOTSTRAP.md](BOOTSTRAP.md).
 
-The goal is simple:
+## Goals
 
-- one canonical local project root: `~/projects`
+- one configurable local project root, usually `~/projects`
 - one interactive launcher for Codex and Claude Code
-- one conservative sync command for all Git repositories
+- one conservative sync command for all managed Git repositories
 - explicit separation between target repositories and delivery workbenches
-- scheduled sync at 13:00, 19:00, and 23:50
+- optional scheduled sync at 13:00, 19:00, and 23:50
 - shared global and project-level instructions
-- reusable prompts for bootstrapping a new machine
-- reusable Codex/Claude assets synced through a private GitHub organization
+- reusable bootstrap prompts for new machines
+- optional syncing of reusable agent assets through a configured GitHub organization or user account
 
 ## Commands
 
+- `workspace-configure` - interactively write local machine config to `~/.config/ai-workspace/config`.
 - `ai-launch codex` - choose a project, then start Codex there.
 - `ai-launch claude` - choose a project, then start Claude Code there.
 - `workspace-sync` - pull/push clean repos only.
 - `workspace-sync --commit` - interactively commit dirty repos before syncing.
 - `workspace-sync --scheduled` - safe scheduled mode; never commits automatically and never pushes to external `origin` remotes.
-- `workspace-new-project <name>` - create a new project under `~/projects`.
-- `workspace-ensure-backup --push` - add private `backup` remotes in `tym83-ai` for upstream repos.
+- `workspace-new-project <name>` - create a new project under the configured project root.
+- `workspace-ensure-backup --push` - add private `backup` remotes in the configured GitHub org/user for upstream repos.
 
 ## Project Picker
 
@@ -60,19 +63,30 @@ Local config lives at:
 ~/.config/ai-workspace/config
 ```
 
+Create or update it with:
+
+```bash
+workspace-configure
+```
+
 Template:
 
 ```text
-PROJECT_ROOTS="$HOME/projects:$HOME/claude"
-SYNC_ROOTS="$HOME/projects:$HOME/claude"
+PROJECTS_HOME="$HOME/projects"
+PROJECT_ROOTS="$HOME/projects"
+SYNC_ROOTS="$HOME/projects"
 GITHUB_ORG=""
 BACKUP_REMOTE="backup"
 CODEX_BIN="$HOME/.local/bin/codex"
 CLAUDE_BIN="$HOME/.local/bin/claude"
+SECRET_SCAN_CMD=""
 ```
 
 Use `PROJECT_ROOTS` for what appears in the picker.
 Use `SYNC_ROOTS` for what scheduled sync touches.
+Set `GITHUB_ORG` to a GitHub organization or user account only on machines where helpers should create or use GitHub repositories.
+
+`SECRET_SCAN_CMD` is optional. If set, `workspace-sync --commit` runs it before committing and appends the repository path as the final argument.
 
 ## Important Boundary
 

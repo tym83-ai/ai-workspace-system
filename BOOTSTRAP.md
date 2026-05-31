@@ -2,28 +2,27 @@
 
 Use this file when setting up a new machine with Codex or Claude Code.
 
-GitHub organization:
+This repository is generic. Before running bootstrap work, provide the agent with:
 
-```text
-https://github.com/tym83-ai
-```
-
-Main repository:
-
-```text
-https://github.com/tym83-ai/ai-workspace-system
-```
+- this repository URL
+- optional GitHub organization or user account for owned repos and private mirrors
+- desired local project root, usually `~/projects`
 
 ## Start Prompt
 
 ```text
-Use this GitHub organization: https://github.com/tym83-ai
-
 Bootstrap my AI workspace on this machine.
 
-First clone:
-https://github.com/tym83-ai/ai-workspace-system.git
-into:
+Repository URL for the workspace system:
+<ai-workspace-system-repo-url>
+
+GitHub organization or user for owned repos and private mirrors:
+<github-org-or-user, or leave empty if disabled>
+
+Local project root:
+~/projects
+
+First clone the workspace system into:
 ~/projects/ai-workspace-system
 
 Then read:
@@ -42,6 +41,7 @@ Rules:
 - Keep Codex and Claude runtime state out of Git.
 - Use AGENTS.md as the canonical shared project instruction file.
 - Use CLAUDE.md as the Claude Code bridge that imports @AGENTS.md.
+- Ask before changing remotes for upstream or mirror repositories.
 
 At the end, show:
 - what was cloned
@@ -55,13 +55,13 @@ At the end, show:
 
 ```bash
 mkdir -p ~/projects
-git clone https://github.com/tym83-ai/ai-workspace-system.git ~/projects/ai-workspace-system
+git clone <ai-workspace-system-repo-url> ~/projects/ai-workspace-system
 ~/projects/ai-workspace-system/bin/install-local
+workspace-configure
 ```
 
 Then review:
 
 ```bash
-~/.config/ai-workspace/config
+sed -n '1,120p' ~/.config/ai-workspace/config
 ```
-

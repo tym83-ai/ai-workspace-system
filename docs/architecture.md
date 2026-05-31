@@ -5,15 +5,14 @@
 ```text
 ~/projects/
   ai-workspace-system/   # this project
-  _codex/                # reusable Codex assets
+  _agent-assets/         # optional reusable Codex/Claude assets
   _artifacts/            # supporting materials, not source repos
   <project>/             # real projects, repo mirrors, and delivery workbenches
-
-~/claude/                # optional legacy Claude project root
 ```
 
-The launcher can list projects from both `~/projects` and `~/claude`.
-Scheduled sync includes configured roots such as `~/projects` and `~/claude`.
+The launcher lists projects from `PROJECT_ROOTS`.
+Scheduled sync includes only `SYNC_ROOTS`.
+Both values are local machine config written by `workspace-configure`.
 
 ## Project Types
 
@@ -28,7 +27,7 @@ Use `workspace.yaml` to connect a workbench to its targets. A target repo should
 
 ## GitHub Layout
 
-Recommended private organization repositories:
+Recommended private organization/account repositories:
 
 - `ai-workspace-system`
 - `ai-workspace-private` or `codex-assets`

@@ -16,12 +16,12 @@ A manifest can make behavior explicit:
 
 ```yaml
 projects:
-  - name: aenix.io
-    path: ~/projects/aenix.io
+  - name: example-site
+    path: ~/projects/example-site
     type: website
-    sync: origin
-  - name: cozystack-website
-    path: ~/claude/cozystack-website
+    sync: backup
+  - name: vendor-docs
+    path: ~/projects/vendor-docs
     type: upstream-mirror
     sync: manual
 ```
@@ -40,26 +40,31 @@ GitHub sync is not a full backup. Use `restic` or `borg` for:
 
 ## Ask Before Changing Upstream Strategy
 
-For repositories whose `origin` is not `tym83-ai`, agents should ask what strategy to use before changing remotes or pushing to upstream.
+For repositories whose `origin` is not owned by the configured `GITHUB_ORG`, agents should ask what strategy to use before changing remotes or pushing to upstream.
 
 Default:
 
 - keep `origin` as canonical upstream
-- add `backup` under `tym83-ai`
+- add `backup` under the configured GitHub org/account
 - scheduled sync pushes to `backup`
 - upstream PRs/commits happen only after explicit instruction
 - exclude deep nested clones such as pipeline workspaces unless explicitly promoted to a managed project
 
 ## Use Secret Scanning Before Organization Push
 
-Run at least:
+Configure an optional scanner:
 
-```bash
-workspace-sync --dry-run
-~/projects/_codex/scripts/audit-secrets ~/projects/<project>
+```text
+SECRET_SCAN_CMD="gitleaks detect --source"
 ```
 
-Prefer `gitleaks` or `trufflehog` if installed.
+Then use:
+
+```bash
+workspace-sync --commit
+```
+
+The sync script appends the repository path to `SECRET_SCAN_CMD`.
 
 ## Keep Instructions Small
 

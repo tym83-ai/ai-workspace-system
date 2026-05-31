@@ -45,8 +45,11 @@ fi
 SYNC_ROOTS="${SYNC_ROOTS:-$HOME/projects}"
 GITHUB_ORG="${GITHUB_ORG:-}"
 BACKUP_REMOTE="${BACKUP_REMOTE:-backup}"
-lock_file="${AI_WORKSPACE_SYNC_LOCK:-$HOME/.cache/ai-workspace-sync.lock}"
-log_dir="${AI_WORKSPACE_LOG_DIR:-$HOME/projects/ai-workspace-system/logs}"
+SECRET_SCAN_CMD="${SECRET_SCAN_CMD:-}"
+cache_home="${XDG_CACHE_HOME:-$HOME/.cache}"
+state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
+lock_file="${AI_WORKSPACE_SYNC_LOCK:-$cache_home/ai-workspace-sync.lock}"
+log_dir="${AI_WORKSPACE_LOG_DIR:-$state_home/ai-workspace/logs}"
 mkdir -p "$(dirname "$lock_file")" "$log_dir"
 
 log_file="$log_dir/workspace-sync-$(date +%Y-%m-%d).log"
@@ -85,6 +88,28 @@ remote_is_org() {
   [[ "$url" == *"github.com/$org/"* || "$url" == *"github.com:$org/"* ]]
 }
 
+confirm_secret_scan() {
+  local repo="$1"
+  local safe_answer
+
+  [[ -n "$SECRET_SCAN_CMD" ]] || return 0
+
+  echo "secret scan: $SECRET_SCAN_CMD"
+  if [[ "$dry_run" = "0" ]]; then
+    if ! bash -lc "$SECRET_SCAN_CMD \"\$1\"" ai-workspace-secret-scan "$repo"; then
+      echo "warn: secret scan command exited non-zero"
+    fi
+  else
+    printf '+ bash -lc %q ai-workspace-secret-scan %q\n' "$SECRET_SCAN_CMD \"\$1\"" "$repo"
+  fi
+
+  read -r -p "Proceed with commit after reviewing secret scan output? [y/N] " safe_answer
+  case "$safe_answer" in
+    y|Y|yes|YES) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 sync_repo() {
   local repo="$1"
   local branch remote backup dirty upstream ahead behind upstream_remote
@@ -118,13 +143,9 @@ sync_repo() {
       read -r -p "Commit all changes in $(basename "$repo")? [y/N] " answer
       case "$answer" in
         y|Y|yes|YES)
-          if [[ -x "$HOME/projects/_codex/scripts/audit-secrets" ]]; then
-            "$HOME/projects/_codex/scripts/audit-secrets" "$repo" || true
-            read -r -p "Proceed with commit after reviewing findings? [y/N] " safe_answer
-            case "$safe_answer" in
-              y|Y|yes|YES) ;;
-              *) echo "skip: commit declined"; return 0 ;;
-            esac
+          if ! confirm_secret_scan "$repo"; then
+            echo "skip: commit declined"
+            return 0
           fi
           read -r -p "Commit message: " message
           message="${message:-chore: workspace sync checkpoint}"

@@ -11,7 +11,7 @@ Rules:
 - Do not delete or overwrite local files without explicit approval.
 - Do not force-push.
 - Do not push to external/upstream `origin` remotes unless I explicitly ask.
-- For external/upstream repos, preserve `origin` and add a `backup` remote in `tym83-ai`.
+- For external/upstream repos, preserve `origin` and add a `backup` remote in the configured GitHub org/account only after confirming the strategy.
 - Do not auto-commit dirty repositories unless I explicitly ask.
 - Keep Claude-specific state out of Codex repos.
 - Use `AGENTS.md` as the canonical shared project instruction file.
@@ -19,10 +19,10 @@ Rules:
 - Separate target repositories from delivery workbenches.
 - Use `workspace.yaml` to connect workbenches to target repositories.
 
-GitHub organization:
+Before changing GitHub remotes, ask for or read local configuration:
 
 ```text
-https://github.com/tym83-ai
+~/.config/ai-workspace/config
 ```
 
 Tasks:
@@ -35,9 +35,10 @@ Tasks:
 6. Create or update `AGENTS.md` in every project.
 7. Create `CLAUDE.md` in every project that imports `@AGENTS.md`, unless a project already has stronger Claude-specific instructions.
 8. Create `workspace.yaml` for workbenches that prepare output for target repositories.
-9. Create a project `~/projects/ai-workspace-system` with docs, scripts, prompts, and systemd timer files.
+9. Create or update a project `~/projects/ai-workspace-system` with docs, scripts, prompts, and systemd timer files.
 10. Create scripts:
    - `ai-launch`
+   - `workspace-configure`
    - `workspace-sync`
    - `workspace-new-project`
    - `install-local`
@@ -49,7 +50,7 @@ Tasks:
 Sync behavior:
 
 - `workspace-sync` should fetch and pull clean repos.
-- It should push committed local changes to `origin` only for repos owned by `tym83-ai`.
+- It should push committed local changes to `origin` only for repos owned by the configured `GITHUB_ORG`.
 - It should push external/upstream repos to `backup`, not `origin`.
 - It should skip dirty repos unless run with `--commit`.
 - It should never force-push.

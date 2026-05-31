@@ -30,7 +30,7 @@ The workbench can reference one or more target repos through `workspace.yaml`.
 ## Default Policy
 
 - Keep `origin` on the target repo pointed at the real upstream.
-- Add `backup` under `tym83-ai` for automatic private backup.
+- Add `backup` under the configured GitHub org/account for automatic private backup when safe.
 - Scheduled sync may push target repo state to `backup`.
 - Upstream `origin` pushes and PRs require explicit user approval.
 - When unsure where a file belongs, keep it in the workbench first.
@@ -42,13 +42,13 @@ Use this shape:
 ```yaml
 name: example-delivery-workbench
 type: delivery-workbench
-owner: tym83-ai
+owner: <github-org-or-user>
 
 targets:
   - name: example-site
     path: ~/projects/example-site
     origin: https://github.com/example/site.git
-    backup: https://github.com/tym83-ai/mirror-example-site.git
+    backup: https://github.com/<github-org-or-user>/mirror-example-site.git
     publish_policy: explicit
     role: target website repository
 

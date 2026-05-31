@@ -13,6 +13,7 @@ if [[ ! -f "$config_dir/config" ]]; then
 fi
 
 ln -sf "$project_dir/bin/ai-launch" "$bin_dir/ai-launch"
+ln -sf "$project_dir/bin/workspace-configure" "$bin_dir/workspace-configure"
 ln -sf "$project_dir/bin/workspace-sync" "$bin_dir/workspace-sync"
 ln -sf "$project_dir/bin/workspace-new-project" "$bin_dir/workspace-new-project"
 ln -sf "$project_dir/bin/workspace-ensure-backup" "$bin_dir/workspace-ensure-backup"
@@ -24,6 +25,9 @@ echo "Installed systemd user units into $systemd_dir"
 echo
 echo "Review config:"
 echo "  $config_dir/config"
+echo
+echo "Configure this machine interactively:"
+echo "  workspace-configure"
 echo
 echo "Enable scheduled sync when ready:"
 echo "  systemctl --user daemon-reload"

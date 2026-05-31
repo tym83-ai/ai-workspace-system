@@ -1,12 +1,12 @@
 name: <project-name>
 type: target-repo | delivery-workbench | research-workbench | integration-workbench
-owner: tym83-ai
+owner: <github-org-or-user>
 
 targets:
   - name: <target-name>
     path: ~/projects/<target-repo>
     origin: https://github.com/<owner>/<repo>.git
-    backup: https://github.com/tym83-ai/<mirror-repo>.git
+    backup: https://github.com/<github-org-or-user>/<mirror-repo>.git
     publish_policy: explicit
     role: <what this target owns>
 

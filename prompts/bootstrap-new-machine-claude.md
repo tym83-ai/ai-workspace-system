@@ -12,10 +12,10 @@ Read and follow:
 - If both exist, do not duplicate large rule sets; make `CLAUDE.md` import `@AGENTS.md`.
 - `workspace.yaml` files for workbenches that prepare output for target repositories.
 
-GitHub organization:
+Before changing GitHub remotes, ask for or read local configuration:
 
 ```text
-https://github.com/tym83-ai
+~/.config/ai-workspace/config
 ```
 
 Tasks:

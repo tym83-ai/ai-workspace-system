@@ -1,8 +1,8 @@
 .env
 .env.*
 !.env.example
-logs/*.log
+logs/
+config/config.local
 *.tmp
 *.swp
 .DS_Store
-

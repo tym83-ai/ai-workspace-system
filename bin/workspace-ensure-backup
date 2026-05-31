@@ -35,7 +35,7 @@ GITHUB_ORG="${GITHUB_ORG:-}"
 BACKUP_REMOTE="${BACKUP_REMOTE:-backup}"
 
 if [[ -z "$GITHUB_ORG" ]]; then
-  echo "GITHUB_ORG is not set." >&2
+  echo "GITHUB_ORG is not set. Run workspace-configure or set it in ~/.config/ai-workspace/config." >&2
   exit 1
 fi
 
