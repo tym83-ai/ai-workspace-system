@@ -1,0 +1,7 @@
+[Unit]
+Description=AI workspace safe Git synchronization
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/workspace-sync --scheduled
+

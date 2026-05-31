@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+name="${1:-}"
+if [[ -z "$name" ]]; then
+  echo "Usage: workspace-new-project <kebab-case-name>" >&2
+  exit 1
+fi
+
+config="${AI_WORKSPACE_CONFIG:-$HOME/.config/ai-workspace/config}"
+if [[ -f "$config" ]]; then
+  # shellcheck disable=SC1090
+  source "$config"
+fi
+
+root="${PROJECTS_HOME:-$HOME/projects}"
+org="${GITHUB_ORG:-}"
+dir="$root/$name"
+
+case "$name" in
+  *[!a-z0-9._-]*)
+    echo "Use lowercase kebab-case project names." >&2
+    exit 1
+    ;;
+esac
+
+if [[ -e "$dir" ]]; then
+  echo "Project already exists: $dir" >&2
+  exit 1
+fi
+
+mkdir -p "$dir"
+cd "$dir"
+
+cat > README.md <<EOF
+# $name
+
+Project scaffolded by AI Workspace System.
+EOF
+
+cat > AGENTS.md <<EOF
+# $name Agent Notes
+
+## Project Purpose
+
+Add the project purpose here.
+
+## Common Commands
+
+- Test:
+- Lint:
+- Build:
+- Run:
+
+## Working Rules
+
+- Inspect project structure before changing files.
+- Keep secrets out of Git.
+- Do not commit generated caches, dependency directories, logs, local databases, or agent session state.
+- Run the narrowest useful verification command after code changes.
+EOF
+
+cat > CLAUDE.md <<'EOF'
+@AGENTS.md
+
+## Claude Code
+
+- Use the shared project instructions above.
+- Add Claude-specific notes here only when needed.
+EOF
+
+cat > .gitignore <<'EOF'
+.env
+.env.*
+!.env.example
+node_modules/
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+.DS_Store
+*.log
+*.tmp
+.claude/settings.local.json
+CLAUDE.local.md
+EOF
+
+touch .env.example
+git init
+git add README.md AGENTS.md CLAUDE.md .gitignore .env.example
+git commit -m "Initial project scaffold"
+
+if [[ -n "$org" ]]; then
+  if command -v gh >/dev/null 2>&1; then
+    gh repo create "$org/$name" --private --source=. --remote=origin --push
+  else
+    echo "gh not found; create GitHub repo manually for $org/$name."
+  fi
+else
+  echo "GITHUB_ORG is not set; project created locally only."
+fi
+
+printf '%s\n' "$dir"
+

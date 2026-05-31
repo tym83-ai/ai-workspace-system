@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+bin_dir="$HOME/.local/bin"
+config_dir="$HOME/.config/ai-workspace"
+systemd_dir="$HOME/.config/systemd/user"
+
+mkdir -p "$bin_dir" "$config_dir" "$systemd_dir"
+
+if [[ ! -f "$config_dir/config" ]]; then
+  cp "$project_dir/config/config.example" "$config_dir/config"
+fi
+
+ln -sf "$project_dir/bin/ai-launch" "$bin_dir/ai-launch"
+ln -sf "$project_dir/bin/workspace-sync" "$bin_dir/workspace-sync"
+ln -sf "$project_dir/bin/workspace-new-project" "$bin_dir/workspace-new-project"
+ln -sf "$project_dir/systemd/ai-workspace-sync.service" "$systemd_dir/ai-workspace-sync.service"
+ln -sf "$project_dir/systemd/ai-workspace-sync.timer" "$systemd_dir/ai-workspace-sync.timer"
+
+echo "Installed scripts into $bin_dir"
+echo "Installed systemd user units into $systemd_dir"
+echo
+echo "Review config:"
+echo "  $config_dir/config"
+echo
+echo "Enable scheduled sync when ready:"
+echo "  systemctl --user daemon-reload"
+echo "  systemctl --user enable --now ai-workspace-sync.timer"
+

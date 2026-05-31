@@ -1,0 +1,29 @@
+# <project-name> Agent Notes
+
+## Project Purpose
+
+Describe what this project is and who uses it.
+
+## Setup
+
+Add install/setup commands here when known.
+
+## Common Commands
+
+- Test:
+- Lint:
+- Build:
+- Run:
+
+## Working Rules
+
+- Inspect project structure before changing files.
+- Keep secrets out of Git.
+- Do not commit generated caches, dependency directories, logs, or local databases.
+- Run the narrowest useful verification after code changes.
+
+## Sync Notes
+
+- Preserve existing remotes unless explicitly asked to change them.
+- Do not force-push.
+

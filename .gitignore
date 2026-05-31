@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+logs/*.log
+*.tmp
+*.swp
+.DS_Store
+

@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mode="normal"
+dry_run=0
+interactive_commit=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --scheduled) mode="scheduled" ;;
+    --dry-run) dry_run=1 ;;
+    --commit) interactive_commit=1 ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: workspace-sync [--scheduled] [--dry-run] [--commit]
+
+Default:
+  Fetch, pull clean repos, and push committed local changes.
+
+--scheduled:
+  Safe cron/systemd mode. Never commits automatically.
+
+--commit:
+  Interactively commit dirty repos before syncing.
+
+--dry-run:
+  Print actions without running pull/push/commit.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+config="${AI_WORKSPACE_CONFIG:-$HOME/.config/ai-workspace/config}"
+if [[ -f "$config" ]]; then
+  # shellcheck disable=SC1090
+  source "$config"
+fi
+
+SYNC_ROOTS="${SYNC_ROOTS:-$HOME/projects}"
+lock_file="${AI_WORKSPACE_SYNC_LOCK:-$HOME/.cache/ai-workspace-sync.lock}"
+log_dir="${AI_WORKSPACE_LOG_DIR:-$HOME/projects/ai-workspace-system/logs}"
+mkdir -p "$(dirname "$lock_file")" "$log_dir"
+
+log_file="$log_dir/workspace-sync-$(date +%Y-%m-%d).log"
+
+run() {
+  printf '+'
+  printf ' %q' "$@"
+  printf '\n'
+  if [[ "$dry_run" = "0" ]]; then
+    "$@"
+  fi
+}
+
+expand_home() {
+  local path="$1"
+  printf '%s\n' "${path/#\~/$HOME}"
+}
+
+discover_repos() {
+  local root
+  IFS=':' read -r -a roots <<< "$SYNC_ROOTS"
+  for root in "${roots[@]}"; do
+    root="$(expand_home "$root")"
+    [[ -d "$root" ]] || continue
+    find "$root" -path '*/.git' -type d -prune -print 2>/dev/null | while read -r gitdir; do
+      printf '%s\n' "${gitdir%/.git}"
+    done
+  done | sort -u
+}
+
+sync_repo() {
+  local repo="$1"
+  local branch remote dirty upstream ahead behind
+
+  echo
+  echo "== $repo"
+
+  remote="$(git -C "$repo" remote get-url origin 2>/dev/null || true)"
+  if [[ -z "$remote" ]]; then
+    echo "skip: no origin remote"
+    return 0
+  fi
+
+  branch="$(git -C "$repo" branch --show-current 2>/dev/null || true)"
+  if [[ -z "$branch" ]]; then
+    echo "skip: detached HEAD or no branch"
+    return 0
+  fi
+
+  dirty="$(git -C "$repo" status --porcelain)"
+  if [[ -n "$dirty" ]]; then
+    if [[ "$interactive_commit" = "1" && "$mode" != "scheduled" ]]; then
+      git -C "$repo" status --short
+      read -r -p "Commit all changes in $(basename "$repo")? [y/N] " answer
+      case "$answer" in
+        y|Y|yes|YES)
+          if [[ -x "$HOME/projects/_codex/scripts/audit-secrets" ]]; then
+            "$HOME/projects/_codex/scripts/audit-secrets" "$repo" || true
+            read -r -p "Proceed with commit after reviewing findings? [y/N] " safe_answer
+            case "$safe_answer" in
+              y|Y|yes|YES) ;;
+              *) echo "skip: commit declined"; return 0 ;;
+            esac
+          fi
+          read -r -p "Commit message: " message
+          message="${message:-chore: workspace sync checkpoint}"
+          run git -C "$repo" add -A
+          run git -C "$repo" commit -m "$message"
+          ;;
+        *) echo "skip: dirty worktree"; return 0 ;;
+      esac
+    else
+      echo "skip: dirty worktree"
+      git -C "$repo" status --short
+      return 0
+    fi
+  fi
+
+  run git -C "$repo" fetch --prune origin
+
+  if ! upstream="$(git -C "$repo" rev-parse --abbrev-ref '@{u}' 2>/dev/null)"; then
+    echo "skip pull/push: no upstream branch"
+    return 0
+  fi
+
+  behind="$(git -C "$repo" rev-list --count "HEAD..$upstream")"
+  ahead="$(git -C "$repo" rev-list --count "$upstream..HEAD")"
+
+  if [[ "$behind" != "0" ]]; then
+    run git -C "$repo" pull --ff-only
+  else
+    echo "ok: no remote changes"
+  fi
+
+  ahead="$(git -C "$repo" rev-list --count '@{u}..HEAD' 2>/dev/null || echo 0)"
+  if [[ "$ahead" != "0" ]]; then
+    run git -C "$repo" push
+  else
+    echo "ok: no committed changes to push"
+  fi
+}
+
+main() {
+  echo "workspace-sync mode=$mode dry_run=$dry_run roots=$SYNC_ROOTS"
+  mapfile -t repos < <(discover_repos)
+  if [[ "${#repos[@]}" = "0" ]]; then
+    echo "No git repos found."
+    return 0
+  fi
+
+  for repo in "${repos[@]}"; do
+    sync_repo "$repo"
+  done
+}
+
+if [[ "$dry_run" = "0" ]]; then
+  exec 9>"$lock_file"
+  if ! flock -n 9; then
+    echo "Another workspace-sync is already running."
+    exit 0
+  fi
+  main 2>&1 | tee -a "$log_file"
+else
+  main
+fi

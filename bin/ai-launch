@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+agent="${1:-}"
+if [[ -z "$agent" ]]; then
+  echo "Usage: ai-launch codex|claude [--list] [agent args...]" >&2
+  exit 1
+fi
+shift || true
+
+list_only=0
+if [[ "${1:-}" == "--list" ]]; then
+  list_only=1
+  shift || true
+fi
+
+config="${AI_WORKSPACE_CONFIG:-$HOME/.config/ai-workspace/config}"
+if [[ -f "$config" ]]; then
+  # shellcheck disable=SC1090
+  source "$config"
+fi
+
+PROJECT_ROOTS="${PROJECT_ROOTS:-$HOME/projects}"
+CODEX_BIN="${CODEX_BIN:-$HOME/.local/bin/codex}"
+CLAUDE_BIN="${CLAUDE_BIN:-$HOME/.local/bin/claude}"
+
+case "$agent" in
+  codex) agent_bin="$CODEX_BIN" ;;
+  claude) agent_bin="$CLAUDE_BIN" ;;
+  *)
+    echo "Unknown agent: $agent" >&2
+    echo "Usage: ai-launch codex|claude [agent args...]" >&2
+    exit 1
+    ;;
+esac
+
+if [[ ! -x "$agent_bin" ]]; then
+  echo "Agent binary is not executable: $agent_bin" >&2
+  exit 1
+fi
+
+expand_home() {
+  local path="$1"
+  printf '%s\n' "${path/#\~/$HOME}"
+}
+
+is_project_dir() {
+  local dir="$1"
+  local base
+  base="$(basename "$dir")"
+
+  [[ -d "$dir" ]] || return 1
+  [[ "$base" == .* ]] && return 1
+  [[ "$base" == _reports ]] && return 1
+  [[ "$base" == _artifacts ]] && return 1
+
+  [[ -d "$dir/.git" || -f "$dir/AGENTS.md" || -f "$dir/CLAUDE.md" || -f "$dir/README.md" || -f "$dir/package.json" || -f "$dir/pyproject.toml" || -f "$dir/go.mod" ]]
+}
+
+discover_projects() {
+  local root
+  IFS=':' read -r -a roots <<< "$PROJECT_ROOTS"
+  for root in "${roots[@]}"; do
+    root="$(expand_home "$root")"
+    [[ -d "$root" ]] || continue
+
+    find "$root" -mindepth 1 -maxdepth 4 -path '*/.git' -type d -prune -print 2>/dev/null | while read -r gitdir; do
+      printf '%s\n' "${gitdir%/.git}"
+    done
+
+    find "$root" -mindepth 1 -maxdepth 1 -type d \
+      -not -path '*/node_modules/*' \
+      -not -path '*/venv/*' \
+      -not -path '*/.venv/*' \
+      -not -path '*/.git/*' \
+      -print 2>/dev/null | while read -r dir; do
+        if is_project_dir "$dir"; then
+          printf '%s\n' "$dir"
+        fi
+      done
+  done | sort -u
+}
+
+launch_agent() {
+  local dir="$1"
+  shift || true
+
+  case "$agent" in
+    codex)
+      exec "$agent_bin" --cd "$dir" "$@"
+      ;;
+    claude)
+      cd "$dir"
+      exec "$agent_bin" "$@"
+      ;;
+  esac
+}
+
+new_project() {
+  local new_name
+  read -r -p "Project name: " new_name
+  if [[ -z "$new_name" ]]; then
+    echo "No project name provided." >&2
+    exit 1
+  fi
+  workspace-new-project "$new_name"
+  launch_agent "$HOME/projects/$new_name" "$@"
+}
+
+mapfile -t projects < <(discover_projects)
+
+if [[ "$list_only" = "1" ]]; then
+  echo "New project"
+  echo "No project"
+  printf '%s\n' "${projects[@]}"
+  exit 0
+fi
+
+echo "Select project for $agent:"
+echo "  1) New project"
+echo "  2) No project"
+
+index=3
+for project in "${projects[@]}"; do
+  label="${project/#$HOME\//~/}"
+  printf '  %d) %s\n' "$index" "$label"
+  index=$((index + 1))
+done
+
+read -r -p "> " choice
+
+case "$choice" in
+  1)
+    new_project "$@"
+    ;;
+  2)
+    launch_agent "$HOME" "$@"
+    ;;
+  ''|*[!0-9]*)
+    echo "Invalid selection: $choice" >&2
+    exit 1
+    ;;
+  *)
+    selected_index=$((choice - 3))
+    if (( selected_index < 0 || selected_index >= ${#projects[@]} )); then
+      echo "Invalid selection: $choice" >&2
+      exit 1
+    fi
+    launch_agent "${projects[$selected_index]}" "$@"
+    ;;
+esac
