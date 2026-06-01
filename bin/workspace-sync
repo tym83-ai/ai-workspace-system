@@ -211,7 +211,13 @@ sync_repo() {
 
 main() {
   echo "workspace-sync mode=$mode dry_run=$dry_run roots=$SYNC_ROOTS"
-  mapfile -t repos < <(discover_repos)
+  # Portable replacement for `mapfile -t` (bash 4+, absent in macOS default bash 3.2).
+  # The `|| [ -n "$repo" ]` guard keeps a final line that lacks a trailing newline.
+  repos=()
+  while IFS= read -r repo || [ -n "$repo" ]; do
+    repos+=("$repo")
+  done < <(discover_repos)
+
   if [[ "${#repos[@]}" = "0" ]]; then
     echo "No git repos found."
     return 0
