@@ -44,13 +44,15 @@ Tasks:
    - `workspace-configure`
    - `workspace-sync`
    - `workspace-new-project`
+   - `workspace-shell-setup`
    - `install-local`
-11. After `GITHUB_ORG` is configured and GitHub CLI is authenticated, run `workspace-sync --clone-only` to hydrate missing repositories from GitHub into `PROJECTS_HOME`.
-12. Configure scheduled sync at 13:00, 19:00, and 23:50 via user systemd timer, but ask before enabling it.
-13. For site/upstream repos, ask before changing remotes. Default to `origin` as upstream and `backup` as private mirror.
-14. Keep prompts, research, raw inputs, generated drafts, and local pipeline state in workbench repos, not target repos.
-15. Save reports under `~/projects/_reports`.
-16. Use `prompts/discover-and-normalize-local-projects.md` as the detailed workflow for existing scattered local projects.
+11. Run `workspace-shell-setup` so `LOCAL_BIN_DIR` is present in shell startup files and `ai-launch` works in new shells.
+12. After `GITHUB_ORG` is configured and GitHub CLI is authenticated, run `workspace-sync --clone-only` to hydrate missing repositories from GitHub into `PROJECTS_HOME`.
+13. Configure scheduled sync at 13:00, 19:00, and 23:50 via user systemd timer, but ask before enabling it.
+14. For site/upstream repos, ask before changing remotes. Default to `origin` as upstream and `backup` as private mirror.
+15. Keep prompts, research, raw inputs, generated drafts, and local pipeline state in workbench repos, not target repos.
+16. Save reports under `~/projects/_reports`.
+17. Use `prompts/discover-and-normalize-local-projects.md` as the detailed workflow for existing scattered local projects.
 
 Sync behavior:
 

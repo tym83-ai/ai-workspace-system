@@ -23,6 +23,7 @@
 ## Команды
 
 - `workspace-configure` - интерактивно пишет локальный конфиг в `~/.config/ai-workspace/config`.
+- `workspace-shell-setup` - добавляет `LOCAL_BIN_DIR` в shell startup files через managed PATH block.
 - `ai-launch codex` - выбрать проект и запустить Codex.
 - `ai-launch claude` - выбрать проект и запустить Claude Code.
 - `workspace-sync` - клонировать недостающие GitHub repos, затем pull/push только чистых репозиториев.
@@ -100,6 +101,7 @@ workspace-configure
 
 ```text
 PROJECTS_HOME="$HOME/projects"
+LOCAL_BIN_DIR="$HOME/.local/bin"
 PROJECT_ROOTS="$HOME/projects"
 SYNC_ROOTS="$HOME/projects"
 GITHUB_ORG=""
@@ -114,6 +116,8 @@ SECRET_SCAN_CMD=""
 
 `PROJECT_ROOTS` управляет списком в picker.
 `SYNC_ROOTS` управляет scheduled sync.
+`LOCAL_BIN_DIR` задает директорию для symlink-команд, которые устанавливает `install-local`.
+Если `ai-launch` или `workspace-*` не находятся в новой shell, запустите `workspace-shell-setup`.
 `GITHUB_ORG` задавайте только там, где helpers должны создавать или использовать GitHub repositories.
 Если `GITHUB_SYNC_REPOS=1`, `workspace-sync` сначала получает список repositories в `GITHUB_ORG` через `gh repo list` и клонирует недостающие в `PROJECTS_HOME`.
 `GITHUB_CLONE_PROTOCOL=ssh` используйте только на машинах с настроенным SSH-доступом к GitHub; по умолчанию безопаснее оставить `https`.

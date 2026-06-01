@@ -16,6 +16,7 @@ Launcher показывает проекты из `PROJECT_ROOTS`.
 Scheduled sync трогает только `SYNC_ROOTS`.
 Оба значения лежат в локальном конфиге, который пишет `workspace-configure`.
 GitHub-to-local hydration клонирует недостающие repositories из `GITHUB_ORG` в `PROJECTS_HOME`.
+Helper-команды устанавливаются symlink'ами в `LOCAL_BIN_DIR`; `workspace-shell-setup` добавляет эту директорию в shell startup files через idempotent managed block.
 
 ## Типы проектов
 

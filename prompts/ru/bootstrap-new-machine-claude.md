@@ -39,10 +39,11 @@
 5. Keep ~/.claude, ~/.claude.json, ~/.codex/auth.json, sessions, logs, sqlite state, and shell history out of Git.
 6. Add baseline docs where missing: README.md, AGENTS.md, CLAUDE.md, workspace.yaml when needed, .gitignore, .env.example when appropriate.
 7. Create or update ~/projects/ai-workspace-system with scripts, docs, prompts, systemd units, templates.
-8. Create global instruction recommendations for ~/.claude/CLAUDE.md, ~/.claude/rules/, ~/.codex/AGENTS.md.
-9. Use prompts/ru/discover-and-normalize-local-projects.md as the detailed workflow for existing scattered local projects.
-10. После настройки GITHUB_ORG и авторизации GitHub CLI запусти workspace-sync --clone-only, чтобы подтянуть недостающие repositories из GitHub в PROJECTS_HOME.
-11. Do not enable scheduled sync until I approve.
+8. Добавь workspace-shell-setup и запусти его, чтобы LOCAL_BIN_DIR был прописан в shell startup files и ai-launch работал в новых shell.
+9. Create global instruction recommendations for ~/.claude/CLAUDE.md, ~/.claude/rules/, ~/.codex/AGENTS.md.
+10. Use prompts/ru/discover-and-normalize-local-projects.md as the detailed workflow for existing scattered local projects.
+11. После настройки GITHUB_ORG и авторизации GitHub CLI запусти workspace-sync --clone-only, чтобы подтянуть недостающие repositories из GitHub в PROJECTS_HOME.
+12. Do not enable scheduled sync until I approve.
 
 Sync design:
 - Sync should use GitHub as a discovery source: list repositories in GITHUB_ORG and clone missing repos into PROJECTS_HOME.

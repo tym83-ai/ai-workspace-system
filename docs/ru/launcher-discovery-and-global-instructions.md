@@ -13,6 +13,15 @@ ai-launch codex
 ai-launch claude
 ```
 
+Если `ai-launch` не находится, запустите:
+
+```bash
+~/.local/bin/workspace-shell-setup
+```
+
+Этот helper ставит managed PATH block в shell startup files, чтобы `LOCAL_BIN_DIR`
+был доступен в новых терминалах и agent shells.
+
 Launcher всегда показывает:
 
 1. `New project`

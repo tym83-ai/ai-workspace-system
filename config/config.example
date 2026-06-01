@@ -1,4 +1,5 @@
 PROJECTS_HOME="$HOME/projects"
+LOCAL_BIN_DIR="$HOME/.local/bin"
 PROJECT_ROOTS="$HOME/projects"
 SYNC_ROOTS="$HOME/projects"
 GITHUB_ORG=""

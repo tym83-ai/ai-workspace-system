@@ -53,13 +53,14 @@ Tasks:
    - prompts
    - systemd units
    - templates
-8. Create global instruction recommendations:
+8. Include `workspace-shell-setup` and run it so `LOCAL_BIN_DIR` is present in shell startup files and `ai-launch` works in new shells.
+9. Create global instruction recommendations:
    - `~/.claude/CLAUDE.md`
    - `~/.claude/rules/`
    - `~/.codex/AGENTS.md`
-9. Use `prompts/discover-and-normalize-local-projects.md` as the detailed workflow for existing scattered local projects.
-10. After `GITHUB_ORG` is configured and GitHub CLI is authenticated, run `workspace-sync --clone-only` to hydrate missing repositories from GitHub into `PROJECTS_HOME`.
-11. Do not enable scheduled sync until I approve.
+10. Use `prompts/discover-and-normalize-local-projects.md` as the detailed workflow for existing scattered local projects.
+11. After `GITHUB_ORG` is configured and GitHub CLI is authenticated, run `workspace-sync --clone-only` to hydrate missing repositories from GitHub into `PROJECTS_HOME`.
+12. Do not enable scheduled sync until I approve.
 
 Sync design:
 

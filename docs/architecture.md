@@ -16,6 +16,7 @@ The launcher lists projects from `PROJECT_ROOTS`.
 Scheduled sync includes only `SYNC_ROOTS`.
 Both values are local machine config written by `workspace-configure`.
 GitHub-to-local hydration clones missing repositories from `GITHUB_ORG` into `PROJECTS_HOME`.
+Helper commands are symlinked into `LOCAL_BIN_DIR`; `workspace-shell-setup` adds that directory to shell startup files with an idempotent managed block.
 
 ## Project Types
 

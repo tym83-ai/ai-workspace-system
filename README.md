@@ -23,6 +23,7 @@ For new machines, start with [BOOTSTRAP.md](BOOTSTRAP.md).
 ## Commands
 
 - `workspace-configure` - interactively write local machine config to `~/.config/ai-workspace/config`.
+- `workspace-shell-setup` - add `LOCAL_BIN_DIR` to shell startup files through a managed PATH block.
 - `ai-launch codex` - choose a project, then start Codex there.
 - `ai-launch claude` - choose a project, then start Claude Code there.
 - `workspace-sync` - clone missing GitHub repos, then pull/push clean repos only.
@@ -100,6 +101,7 @@ Template:
 
 ```text
 PROJECTS_HOME="$HOME/projects"
+LOCAL_BIN_DIR="$HOME/.local/bin"
 PROJECT_ROOTS="$HOME/projects"
 SYNC_ROOTS="$HOME/projects"
 GITHUB_ORG=""
@@ -114,6 +116,8 @@ SECRET_SCAN_CMD=""
 
 Use `PROJECT_ROOTS` for what appears in the picker.
 Use `SYNC_ROOTS` for what scheduled sync touches.
+Use `LOCAL_BIN_DIR` for the symlinked helper commands installed by `install-local`.
+Run `workspace-shell-setup` when `ai-launch` or `workspace-*` commands are not found in a new shell.
 Set `GITHUB_ORG` to a GitHub organization or user account only on machines where helpers should create or use GitHub repositories.
 When `GITHUB_SYNC_REPOS=1`, `workspace-sync` first lists repositories in `GITHUB_ORG` with `gh repo list` and clones any missing ones into `PROJECTS_HOME`.
 Use `GITHUB_CLONE_PROTOCOL=ssh` only on machines with working SSH auth; otherwise keep the default `https`.

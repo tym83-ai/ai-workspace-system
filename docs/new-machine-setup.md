@@ -24,6 +24,9 @@
    ~/projects/ai-workspace-system/bin/install-local
    ```
 
+   The installer symlinks helper commands into `LOCAL_BIN_DIR` and runs `workspace-shell-setup`
+   so `ai-launch` and `workspace-*` are available in new shells.
+
 5. Configure this machine:
 
    ```bash
@@ -31,7 +34,14 @@
    sed -n '1,120p' ~/.config/ai-workspace/config
    ```
 
-6. Hydrate local projects from GitHub:
+6. If commands are not found in a new shell, repair PATH integration:
+
+   ```bash
+   ~/.local/bin/workspace-shell-setup
+   command -v ai-launch
+   ```
+
+7. Hydrate local projects from GitHub:
 
    ```bash
    workspace-sync --clone-only
@@ -40,7 +50,7 @@
    This lists repositories in `GITHUB_ORG` with `gh repo list` and clones missing ones into `PROJECTS_HOME`.
    Existing directories and existing remotes are not overwritten.
 
-7. Enable scheduled sync only after reviewing config and dry-run output:
+8. Enable scheduled sync only after reviewing config and dry-run output:
 
    ```bash
    workspace-sync --dry-run

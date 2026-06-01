@@ -15,15 +15,20 @@
 set -euo pipefail
 
 initial_sync=1
+shell_setup=1
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --no-initial-sync) initial_sync=0 ;;
+    --no-shell-setup) shell_setup=0 ;;
     -h|--help)
       cat <<'EOF'
-Usage: install-local [--no-initial-sync]
+Usage: install-local [--no-initial-sync] [--no-shell-setup]
 
 Installs local AI workspace helper scripts.
+
+By default, the installer runs `workspace-shell-setup` to add LOCAL_BIN_DIR
+to shell startup files through a managed PATH block.
 
 If a configured GITHUB_ORG is already present in ~/.config/ai-workspace/config,
 the installer also runs `workspace-sync --clone-only` to hydrate this machine
@@ -40,21 +45,36 @@ EOF
 done
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-bin_dir="$HOME/.local/bin"
 config_dir="$HOME/.config/ai-workspace"
 systemd_dir="$HOME/.config/systemd/user"
 
-mkdir -p "$bin_dir" "$config_dir" "$systemd_dir"
+expand_home() {
+  local path="$1"
+  printf '%s\n' "${path/#\~/$HOME}"
+}
+
+mkdir -p "$config_dir" "$systemd_dir"
 
 if [[ ! -f "$config_dir/config" ]]; then
   cp "$project_dir/config/config.example" "$config_dir/config"
 fi
+
+if [[ -f "$config_dir/config" ]]; then
+  # shellcheck disable=SC1090
+  source "$config_dir/config"
+fi
+
+LOCAL_BIN_DIR="${LOCAL_BIN_DIR:-$HOME/.local/bin}"
+bin_dir="$(expand_home "$LOCAL_BIN_DIR")"
+
+mkdir -p "$bin_dir"
 
 ln -sf "$project_dir/bin/ai-launch" "$bin_dir/ai-launch"
 ln -sf "$project_dir/bin/workspace-configure" "$bin_dir/workspace-configure"
 ln -sf "$project_dir/bin/workspace-sync" "$bin_dir/workspace-sync"
 ln -sf "$project_dir/bin/workspace-new-project" "$bin_dir/workspace-new-project"
 ln -sf "$project_dir/bin/workspace-ensure-backup" "$bin_dir/workspace-ensure-backup"
+ln -sf "$project_dir/bin/workspace-shell-setup" "$bin_dir/workspace-shell-setup"
 ln -sf "$project_dir/systemd/ai-workspace-sync.service" "$systemd_dir/ai-workspace-sync.service"
 ln -sf "$project_dir/systemd/ai-workspace-sync.timer" "$systemd_dir/ai-workspace-sync.timer"
 
@@ -67,16 +87,21 @@ echo
 echo "Configure this machine interactively:"
 echo "  workspace-configure"
 echo
+echo "Repair or review shell PATH integration:"
+echo "  workspace-shell-setup --dry-run"
+echo "  workspace-shell-setup"
+echo
 echo "Enable scheduled sync when ready:"
 echo "  systemctl --user daemon-reload"
 echo "  systemctl --user enable --now ai-workspace-sync.timer"
 
-if [[ "$initial_sync" = "1" ]]; then
-  if [[ -f "$config_dir/config" ]]; then
-    # shellcheck disable=SC1090
-    source "$config_dir/config"
-  fi
+if [[ "$shell_setup" = "1" ]]; then
+  echo
+  echo "Shell PATH integration:"
+  "$bin_dir/workspace-shell-setup"
+fi
 
+if [[ "$initial_sync" = "1" ]]; then
   if [[ -n "${GITHUB_ORG:-}" ]]; then
     echo
     echo "Initial GitHub project hydration:"

@@ -40,6 +40,7 @@ Rules:
 - Do not delete local files.
 - Do not force-push.
 - Do not auto-commit dirty repositories.
+- Ensure ai-workspace helper commands are reachable by configuring shell PATH with the workspace helper, not ad hoc profile edits.
 - After GitHub CLI auth and local config, clone missing repositories from the configured GitHub org/user into the local project root.
 - Do not enable scheduled sync until you show me what will be enabled.
 - Keep Codex and Claude runtime state out of Git.
@@ -62,6 +63,7 @@ mkdir -p ~/projects
 git clone <ai-workspace-system-repo-url> ~/projects/ai-workspace-system
 ~/projects/ai-workspace-system/bin/install-local
 workspace-configure
+workspace-shell-setup
 workspace-sync --clone-only
 ```
 

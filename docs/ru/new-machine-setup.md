@@ -24,6 +24,9 @@
    ~/projects/ai-workspace-system/bin/install-local
    ```
 
+   Installer создает symlinks для helper-команд в `LOCAL_BIN_DIR` и запускает `workspace-shell-setup`,
+   чтобы `ai-launch` и `workspace-*` были доступны в новых shell.
+
 5. Настройте машину:
 
    ```bash
@@ -31,7 +34,14 @@
    sed -n '1,120p' ~/.config/ai-workspace/config
    ```
 
-6. Подтяните локальные проекты из GitHub:
+6. Если команды не находятся в новой shell, почините PATH integration:
+
+   ```bash
+   ~/.local/bin/workspace-shell-setup
+   command -v ai-launch
+   ```
+
+7. Подтяните локальные проекты из GitHub:
 
    ```bash
    workspace-sync --clone-only
@@ -40,7 +50,7 @@
    Команда получает список repositories в `GITHUB_ORG` через `gh repo list` и клонирует недостающие в `PROJECTS_HOME`.
    Существующие директории и существующие remotes не перезаписываются.
 
-7. Включайте scheduled sync только после проверки config и dry-run:
+8. Включайте scheduled sync только после проверки config и dry-run:
 
    ```bash
    workspace-sync --dry-run

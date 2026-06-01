@@ -40,6 +40,7 @@ Local project root:
 - Не удаляй локальные файлы.
 - Не делай force-push.
 - Не коммить dirty repositories автоматически.
+- Сделай ai-workspace helper commands доступными через настройку shell PATH штатным helper'ом workspace, а не разовыми ad hoc правками профиля.
 - После авторизации GitHub CLI и настройки локального конфига склонируй недостающие repositories из настроенной GitHub org/user в локальный project root.
 - Не включай scheduled sync, пока не покажешь, что будет включено.
 - Не добавляй runtime state Codex и Claude в Git.
@@ -62,6 +63,7 @@ mkdir -p ~/projects
 git clone <ai-workspace-system-repo-url> ~/projects/ai-workspace-system
 ~/projects/ai-workspace-system/bin/install-local
 workspace-configure
+workspace-shell-setup
 workspace-sync --clone-only
 ```
 

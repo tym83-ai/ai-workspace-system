@@ -1,0 +1,180 @@
+#!/usr/bin/env bash
+# Copyright 2026 Timur Tukaev
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+set -euo pipefail
+
+dry_run=0
+remove=0
+profiles=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run) dry_run=1 ;;
+    --remove) remove=1 ;;
+    --profile)
+      shift
+      if [[ -z "${1:-}" ]]; then
+        echo "--profile requires a path" >&2
+        exit 1
+      fi
+      profiles+=("$1")
+      ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: workspace-shell-setup [--dry-run] [--remove] [--profile PATH]
+
+Adds or removes a managed PATH block in shell startup files so ai-workspace
+helpers installed into LOCAL_BIN_DIR are available as commands.
+
+Default profile targets:
+  zsh  -> ~/.zprofile and ~/.zshrc
+  bash -> ~/.bash_profile and ~/.bashrc
+  else -> ~/.profile
+
+The managed block is idempotent and does not print shell profile contents.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+config="${AI_WORKSPACE_CONFIG:-$HOME/.config/ai-workspace/config}"
+if [[ -f "$config" ]]; then
+  # shellcheck disable=SC1090
+  source "$config"
+fi
+
+LOCAL_BIN_DIR="${LOCAL_BIN_DIR:-$HOME/.local/bin}"
+
+expand_home() {
+  local path="$1"
+  printf '%s\n' "${path/#\~/$HOME}"
+}
+
+default_profiles() {
+  local shell_name
+  shell_name="$(basename "${SHELL:-}")"
+
+  case "$shell_name" in
+    zsh)
+      printf '%s\n' "$HOME/.zprofile"
+      printf '%s\n' "$HOME/.zshrc"
+      ;;
+    bash)
+      printf '%s\n' "$HOME/.bash_profile"
+      printf '%s\n' "$HOME/.bashrc"
+      ;;
+    *)
+      printf '%s\n' "$HOME/.profile"
+      ;;
+  esac
+}
+
+managed_block() {
+  local quoted_bin
+  printf -v quoted_bin '%q' "$(expand_home "$LOCAL_BIN_DIR")"
+
+  cat <<EOF
+# >>> ai-workspace-system PATH >>>
+# Managed by ai-workspace-system. Makes ai-launch and workspace-* helpers available.
+_ai_workspace_bin=$quoted_bin
+case ":\$PATH:" in
+  *":\$_ai_workspace_bin:"*) ;;
+  *) export PATH="\$_ai_workspace_bin:\$PATH" ;;
+esac
+unset _ai_workspace_bin
+# <<< ai-workspace-system PATH <<<
+EOF
+}
+
+rewrite_profile() {
+  local profile="$1"
+  local tmp start end block
+
+  profile="$(expand_home "$profile")"
+  start="# >>> ai-workspace-system PATH >>>"
+  end="# <<< ai-workspace-system PATH <<<"
+  tmp="$(mktemp)"
+
+  if [[ -f "$profile" ]]; then
+    awk -v start="$start" -v end="$end" '
+      $0 == start { skip = 1; next }
+      $0 == end { skip = 0; next }
+      skip != 1 { print }
+    ' "$profile" > "$tmp"
+  fi
+
+  if [[ "$remove" = "0" ]]; then
+    block="$(managed_block)"
+    if [[ -s "$tmp" ]]; then
+      printf '\n' >> "$tmp"
+    fi
+    printf '%s\n' "$block" >> "$tmp"
+  fi
+
+  if [[ "$dry_run" = "1" ]]; then
+    if [[ "$remove" = "1" ]]; then
+      echo "would remove managed PATH block from $profile"
+    else
+      echo "would install managed PATH block into $profile"
+    fi
+    rm -f "$tmp"
+    return 0
+  fi
+
+  mkdir -p "$(dirname "$profile")"
+  if [[ "$remove" = "1" && ! -f "$profile" ]]; then
+    rm -f "$tmp"
+    echo "ok: profile does not exist: $profile"
+    return 0
+  fi
+
+  cat "$tmp" > "$profile"
+  rm -f "$tmp"
+
+  if [[ "$remove" = "1" ]]; then
+    echo "updated: removed managed PATH block from $profile"
+  else
+    echo "updated: installed managed PATH block into $profile"
+  fi
+}
+
+main() {
+  local profile
+
+  mkdir -p "$(expand_home "$LOCAL_BIN_DIR")"
+
+  if [[ "${#profiles[@]}" = "0" ]]; then
+    while IFS= read -r profile || [ -n "$profile" ]; do
+      profiles+=("$profile")
+    done < <(default_profiles)
+  fi
+
+  for profile in "${profiles[@]}"; do
+    rewrite_profile "$profile"
+  done
+
+  if [[ "$remove" = "0" ]]; then
+    echo
+    echo "Open a new shell, or reload your profile, then verify with:"
+    echo "  command -v ai-launch"
+  fi
+}
+
+main
