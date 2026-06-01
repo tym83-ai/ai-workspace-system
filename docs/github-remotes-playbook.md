@@ -75,14 +75,35 @@ Policy:
 `~/.config/ai-workspace/config` separates discovery from sync:
 
 ```text
+PROJECTS_HOME="$HOME/projects"
 PROJECT_ROOTS="$HOME/projects"
 SYNC_ROOTS="$HOME/projects"
+GITHUB_ORG="<github-org-or-user>"
+GITHUB_SYNC_REPOS="1"
 ```
 
 Use `PROJECT_ROOTS` to show projects in the picker.
 Add a root to `SYNC_ROOTS` only when you are comfortable with scheduled fetch/pull/push for every repo under it.
 
 External `origin` remotes are treated as read-mostly upstreams. `workspace-sync` may fetch/pull from them, but it pushes only to `backup`.
+
+## GitHub To Local Hydration
+
+On a new machine or after creating repositories from another machine, run:
+
+```bash
+workspace-sync --clone-only
+```
+
+The command lists repositories in `GITHUB_ORG` through GitHub CLI and clones any missing repositories into `PROJECTS_HOME`.
+Normal `workspace-sync` and scheduled sync perform the same discovery phase before local fetch/pull/push.
+
+Safety rules:
+
+- existing directories are skipped, not overwritten;
+- existing remotes are not changed;
+- dirty repositories are still skipped for pull/push;
+- no force-push is used.
 
 ## Create Backup Remotes
 

@@ -37,13 +37,15 @@
 8. Create workspace.yaml for workbenches that prepare output for target repositories.
 9. Create or update ~/projects/ai-workspace-system with docs, scripts, prompts, and systemd timer files.
 10. Create scripts: ai-launch, workspace-configure, workspace-sync, workspace-new-project, install-local.
-11. Configure scheduled sync at 13:00, 19:00, and 23:50 via user systemd timer, but ask before enabling it.
-12. For site/upstream repos, ask before changing remotes. Default to origin as upstream and backup as private mirror.
-13. Keep prompts, research, raw inputs, generated drafts, and local pipeline state in workbench repos, not target repos.
-14. Save reports under ~/projects/_reports.
-15. Use prompts/ru/discover-and-normalize-local-projects.md as the detailed workflow for existing scattered local projects.
+11. После настройки GITHUB_ORG и авторизации GitHub CLI запусти workspace-sync --clone-only, чтобы подтянуть недостающие repositories из GitHub в PROJECTS_HOME.
+12. Configure scheduled sync at 13:00, 19:00, and 23:50 via user systemd timer, but ask before enabling it.
+13. For site/upstream repos, ask before changing remotes. Default to origin as upstream and backup as private mirror.
+14. Keep prompts, research, raw inputs, generated drafts, and local pipeline state in workbench repos, not target repos.
+15. Save reports under ~/projects/_reports.
+16. Use prompts/ru/discover-and-normalize-local-projects.md as the detailed workflow for existing scattered local projects.
 
 Sync behavior:
+- workspace-sync should list repositories in GITHUB_ORG with gh repo list and clone missing repos into PROJECTS_HOME.
 - workspace-sync should fetch and pull clean repos.
 - It should push committed local changes to origin only for repos owned by the configured GITHUB_ORG.
 - It should push external/upstream repos to backup, not origin.

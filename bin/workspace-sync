@@ -17,24 +17,35 @@ set -euo pipefail
 mode="normal"
 dry_run=0
 interactive_commit=0
+clone_missing=1
+clone_only=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --scheduled) mode="scheduled" ;;
     --dry-run) dry_run=1 ;;
     --commit) interactive_commit=1 ;;
+    --clone-only) clone_only=1 ;;
+    --no-clone-missing) clone_missing=0 ;;
     -h|--help)
       cat <<'EOF'
-Usage: workspace-sync [--scheduled] [--dry-run] [--commit]
+Usage: workspace-sync [--scheduled] [--dry-run] [--commit] [--clone-only] [--no-clone-missing]
 
 Default:
-  Fetch, pull clean repos, and push committed local changes.
+  Clone missing repos from GITHUB_ORG, then fetch, pull clean repos,
+  and push committed local changes.
 
 --scheduled:
   Safe cron/systemd mode. Never commits automatically.
 
 --commit:
   Interactively commit dirty repos before syncing.
+
+--clone-only:
+  Clone missing repos from GITHUB_ORG, then exit.
+
+--no-clone-missing:
+  Skip GitHub-to-local discovery and cloning.
 
 --dry-run:
   Print actions without running pull/push/commit.
@@ -55,8 +66,13 @@ if [[ -f "$config" ]]; then
   source "$config"
 fi
 
-SYNC_ROOTS="${SYNC_ROOTS:-$HOME/projects}"
+PROJECTS_HOME="${PROJECTS_HOME:-$HOME/projects}"
+PROJECT_ROOTS="${PROJECT_ROOTS:-$PROJECTS_HOME}"
+SYNC_ROOTS="${SYNC_ROOTS:-$PROJECTS_HOME}"
 GITHUB_ORG="${GITHUB_ORG:-}"
+GITHUB_SYNC_REPOS="${GITHUB_SYNC_REPOS:-1}"
+GITHUB_CLONE_PROTOCOL="${GITHUB_CLONE_PROTOCOL:-https}"
+GITHUB_REPO_LIMIT="${GITHUB_REPO_LIMIT:-200}"
 BACKUP_REMOTE="${BACKUP_REMOTE:-backup}"
 SECRET_SCAN_CMD="${SECRET_SCAN_CMD:-}"
 cache_home="${XDG_CACHE_HOME:-$HOME/.cache}"
@@ -83,7 +99,22 @@ expand_home() {
 
 discover_repos() {
   local root
+  local -a roots
   IFS=':' read -r -a roots <<< "$SYNC_ROOTS"
+  for root in "${roots[@]}"; do
+    root="$(expand_home "$root")"
+    [[ -d "$root" ]] || continue
+    find "$root" -maxdepth 4 -path '*/.git' -type d -prune -print 2>/dev/null | while read -r gitdir; do
+      printf '%s\n' "${gitdir%/.git}"
+    done
+  done | sort -u
+}
+
+discover_known_repos() {
+  local root root_list
+  local -a roots
+  root_list="$SYNC_ROOTS:$PROJECT_ROOTS:$PROJECTS_HOME"
+  IFS=':' read -r -a roots <<< "$root_list"
   for root in "${roots[@]}"; do
     root="$(expand_home "$root")"
     [[ -d "$root" ]] || continue
@@ -99,6 +130,104 @@ remote_is_org() {
 
   [[ -n "$org" ]] || return 1
   [[ "$url" == *"github.com/$org/"* || "$url" == *"github.com:$org/"* ]]
+}
+
+remote_matches_github_repo() {
+  local remote="$1"
+  local name="$2"
+  local https_url="$3"
+  local ssh_url="$4"
+
+  [[ "$remote" == "$https_url" || "$remote" == "$https_url.git" ]] && return 0
+  [[ "$remote" == "$ssh_url" || "$remote" == "$ssh_url.git" ]] && return 0
+  [[ "$remote" == "https://github.com/$GITHUB_ORG/$name" ]] && return 0
+  [[ "$remote" == "https://github.com/$GITHUB_ORG/$name.git" ]] && return 0
+  [[ "$remote" == "git@github.com:$GITHUB_ORG/$name.git" ]] && return 0
+  [[ "$remote" == "ssh://git@github.com/$GITHUB_ORG/$name.git" ]] && return 0
+
+  return 1
+}
+
+github_repo_already_local() {
+  local name="$1"
+  local https_url="$2"
+  local ssh_url="$3"
+  local repo remote
+
+  while IFS= read -r repo || [ -n "$repo" ]; do
+    remote="$(git -C "$repo" remote get-url origin 2>/dev/null || true)"
+    if remote_matches_github_repo "$remote" "$name" "$https_url" "$ssh_url"; then
+      echo "ok: GitHub repo already local: $repo"
+      return 0
+    fi
+  done < <(discover_known_repos)
+
+  return 1
+}
+
+github_clone_url() {
+  local https_url="$1"
+  local ssh_url="$2"
+
+  case "$GITHUB_CLONE_PROTOCOL" in
+    ssh) printf '%s\n' "$ssh_url" ;;
+    https) printf '%s\n' "$https_url" ;;
+    *)
+      echo "warn: unknown GITHUB_CLONE_PROTOCOL=$GITHUB_CLONE_PROTOCOL; using https" >&2
+      printf '%s\n' "$https_url"
+      ;;
+  esac
+}
+
+clone_missing_github_repos() {
+  local clone_root repo_lines name https_url ssh_url clone_url target
+
+  [[ "$clone_missing" = "1" || "$clone_only" = "1" ]] || return 0
+  [[ "$GITHUB_SYNC_REPOS" != "0" || "$clone_only" = "1" ]] || return 0
+  [[ -n "$GITHUB_ORG" ]] || return 0
+
+  if ! command -v gh >/dev/null 2>&1; then
+    echo "warn: gh not found; skip GitHub repo discovery"
+    return 0
+  fi
+
+  clone_root="$(expand_home "$PROJECTS_HOME")"
+  echo
+  echo "== GitHub discovery: $GITHUB_ORG -> $clone_root"
+  run mkdir -p "$clone_root"
+
+  if ! repo_lines="$(gh repo list "$GITHUB_ORG" --limit "$GITHUB_REPO_LIMIT" --json name,url,sshUrl --jq '.[] | [.name, .url, .sshUrl] | @tsv' 2>&1)"; then
+    echo "warn: cannot list GitHub repos for $GITHUB_ORG"
+    printf '%s\n' "$repo_lines" | sed 's/^/warn: /'
+    return 0
+  fi
+
+  if [[ -z "$repo_lines" ]]; then
+    echo "ok: no GitHub repos found"
+    return 0
+  fi
+
+  while IFS=$'\t' read -r name https_url ssh_url || [ -n "$name" ]; do
+    [[ -n "$name" ]] || continue
+    target="$clone_root/$name"
+
+    if [[ -d "$target/.git" ]]; then
+      echo "ok: already cloned: $target"
+      continue
+    fi
+
+    if github_repo_already_local "$name" "$https_url" "$ssh_url"; then
+      continue
+    fi
+
+    if [[ -e "$target" ]]; then
+      echo "skip clone: path exists but is not a git repo: $target"
+      continue
+    fi
+
+    clone_url="$(github_clone_url "$https_url" "$ssh_url")"
+    run git clone "$clone_url" "$target"
+  done <<< "$repo_lines"
 }
 
 confirm_secret_scan() {
@@ -210,7 +339,13 @@ sync_repo() {
 }
 
 main() {
-  echo "workspace-sync mode=$mode dry_run=$dry_run roots=$SYNC_ROOTS"
+  echo "workspace-sync mode=$mode dry_run=$dry_run roots=$SYNC_ROOTS github_org=${GITHUB_ORG:-<disabled>}"
+  clone_missing_github_repos
+
+  if [[ "$clone_only" = "1" ]]; then
+    return 0
+  fi
+
   # Portable replacement for `mapfile -t` (bash 4+, absent in macOS default bash 3.2).
   # The `|| [ -n "$repo" ]` guard keeps a final line that lacks a trailing newline.
   repos=()

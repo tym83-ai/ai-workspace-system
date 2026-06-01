@@ -25,9 +25,10 @@
 - `workspace-configure` - интерактивно пишет локальный конфиг в `~/.config/ai-workspace/config`.
 - `ai-launch codex` - выбрать проект и запустить Codex.
 - `ai-launch claude` - выбрать проект и запустить Claude Code.
-- `workspace-sync` - pull/push только чистых репозиториев.
+- `workspace-sync` - клонировать недостающие GitHub repos, затем pull/push только чистых репозиториев.
 - `workspace-sync --commit` - интерактивно закоммитить dirty repos перед sync.
 - `workspace-sync --scheduled` - безопасный scheduled mode: без auto-commit и без push во внешний `origin`.
+- `workspace-sync --clone-only` - подтянуть на эту машину недостающие repos из `GITHUB_ORG` и выйти.
 - `workspace-new-project <name>` - создать новый проект в настроенном project root.
 - `workspace-ensure-backup --push` - добавить приватный `backup` remote для upstream-репозиториев.
 
@@ -70,6 +71,7 @@ prompts/ru/discover-and-normalize-local-projects.md
 
 Автоматический sync намеренно консервативный:
 
+- клонирует недостающие repositories из `GITHUB_ORG` в `PROJECTS_HOME`;
 - fetch remotes;
 - pull только чистых worktrees с upstream branches;
 - push только уже закоммиченных локальных изменений;
@@ -101,6 +103,9 @@ PROJECTS_HOME="$HOME/projects"
 PROJECT_ROOTS="$HOME/projects"
 SYNC_ROOTS="$HOME/projects"
 GITHUB_ORG=""
+GITHUB_SYNC_REPOS="1"
+GITHUB_CLONE_PROTOCOL="https"
+GITHUB_REPO_LIMIT="200"
 BACKUP_REMOTE="backup"
 CODEX_BIN="$HOME/.local/bin/codex"
 CLAUDE_BIN="$HOME/.local/bin/claude"
@@ -110,6 +115,8 @@ SECRET_SCAN_CMD=""
 `PROJECT_ROOTS` управляет списком в picker.
 `SYNC_ROOTS` управляет scheduled sync.
 `GITHUB_ORG` задавайте только там, где helpers должны создавать или использовать GitHub repositories.
+Если `GITHUB_SYNC_REPOS=1`, `workspace-sync` сначала получает список repositories в `GITHUB_ORG` через `gh repo list` и клонирует недостающие в `PROJECTS_HOME`.
+`GITHUB_CLONE_PROTOCOL=ssh` используйте только на машинах с настроенным SSH-доступом к GitHub; по умолчанию безопаснее оставить `https`.
 
 `SECRET_SCAN_CMD` опционален. Если он задан, `workspace-sync --commit` запускает его перед commit и добавляет путь репозитория последним аргументом.
 

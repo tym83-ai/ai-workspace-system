@@ -122,7 +122,10 @@ new_project() {
   launch_agent "$new_dir" "$@"
 }
 
-mapfile -t projects < <(discover_projects)
+projects=()
+while IFS= read -r project; do
+  projects+=("$project")
+done < <(discover_projects)
 
 if [[ "$list_only" = "1" ]]; then
   echo "New project"

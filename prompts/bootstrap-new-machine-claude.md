@@ -58,10 +58,12 @@ Tasks:
    - `~/.claude/rules/`
    - `~/.codex/AGENTS.md`
 9. Use `prompts/discover-and-normalize-local-projects.md` as the detailed workflow for existing scattered local projects.
-10. Do not enable scheduled sync until I approve.
+10. After `GITHUB_ORG` is configured and GitHub CLI is authenticated, run `workspace-sync --clone-only` to hydrate missing repositories from GitHub into `PROJECTS_HOME`.
+11. Do not enable scheduled sync until I approve.
 
 Sync design:
 
+- Sync should use GitHub as a discovery source: list repositories in `GITHUB_ORG` and clone missing repos into `PROJECTS_HOME`.
 - Clean repos can be pulled and pushed automatically.
 - Dirty repos must be skipped by scheduled sync.
 - Interactive sync may ask before committing dirty repos.

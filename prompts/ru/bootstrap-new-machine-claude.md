@@ -41,9 +41,11 @@
 7. Create or update ~/projects/ai-workspace-system with scripts, docs, prompts, systemd units, templates.
 8. Create global instruction recommendations for ~/.claude/CLAUDE.md, ~/.claude/rules/, ~/.codex/AGENTS.md.
 9. Use prompts/ru/discover-and-normalize-local-projects.md as the detailed workflow for existing scattered local projects.
-10. Do not enable scheduled sync until I approve.
+10. После настройки GITHUB_ORG и авторизации GitHub CLI запусти workspace-sync --clone-only, чтобы подтянуть недостающие repositories из GitHub в PROJECTS_HOME.
+11. Do not enable scheduled sync until I approve.
 
 Sync design:
+- Sync should use GitHub as a discovery source: list repositories in GITHUB_ORG and clone missing repos into PROJECTS_HOME.
 - Clean repos can be pulled and pushed automatically.
 - Dirty repos must be skipped by scheduled sync.
 - Interactive sync may ask before committing dirty repos.

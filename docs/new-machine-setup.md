@@ -31,7 +31,16 @@
    sed -n '1,120p' ~/.config/ai-workspace/config
    ```
 
-6. Enable scheduled sync only after reviewing config and dry-run output:
+6. Hydrate local projects from GitHub:
+
+   ```bash
+   workspace-sync --clone-only
+   ```
+
+   This lists repositories in `GITHUB_ORG` with `gh repo list` and clones missing ones into `PROJECTS_HOME`.
+   Existing directories and existing remotes are not overwritten.
+
+7. Enable scheduled sync only after reviewing config and dry-run output:
 
    ```bash
    workspace-sync --dry-run

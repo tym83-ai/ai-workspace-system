@@ -25,9 +25,10 @@ For new machines, start with [BOOTSTRAP.md](BOOTSTRAP.md).
 - `workspace-configure` - interactively write local machine config to `~/.config/ai-workspace/config`.
 - `ai-launch codex` - choose a project, then start Codex there.
 - `ai-launch claude` - choose a project, then start Claude Code there.
-- `workspace-sync` - pull/push clean repos only.
+- `workspace-sync` - clone missing GitHub repos, then pull/push clean repos only.
 - `workspace-sync --commit` - interactively commit dirty repos before syncing.
 - `workspace-sync --scheduled` - safe scheduled mode; never commits automatically and never pushes to external `origin` remotes.
+- `workspace-sync --clone-only` - hydrate this machine with missing repos from `GITHUB_ORG`, then exit.
 - `workspace-new-project <name>` - create a new project under the configured project root.
 - `workspace-ensure-backup --push` - add private `backup` remotes in the configured GitHub org/user for upstream repos.
 
@@ -70,6 +71,7 @@ Agents should not overwrite these files. If they already exist, preserve them an
 
 Automated sync is intentionally conservative:
 
+- clones missing repositories from `GITHUB_ORG` into `PROJECTS_HOME`
 - fetches remotes
 - pulls only clean worktrees with upstream branches
 - pushes only committed local changes
@@ -101,6 +103,9 @@ PROJECTS_HOME="$HOME/projects"
 PROJECT_ROOTS="$HOME/projects"
 SYNC_ROOTS="$HOME/projects"
 GITHUB_ORG=""
+GITHUB_SYNC_REPOS="1"
+GITHUB_CLONE_PROTOCOL="https"
+GITHUB_REPO_LIMIT="200"
 BACKUP_REMOTE="backup"
 CODEX_BIN="$HOME/.local/bin/codex"
 CLAUDE_BIN="$HOME/.local/bin/claude"
@@ -110,6 +115,8 @@ SECRET_SCAN_CMD=""
 Use `PROJECT_ROOTS` for what appears in the picker.
 Use `SYNC_ROOTS` for what scheduled sync touches.
 Set `GITHUB_ORG` to a GitHub organization or user account only on machines where helpers should create or use GitHub repositories.
+When `GITHUB_SYNC_REPOS=1`, `workspace-sync` first lists repositories in `GITHUB_ORG` with `gh repo list` and clones any missing ones into `PROJECTS_HOME`.
+Use `GITHUB_CLONE_PROTOCOL=ssh` only on machines with working SSH auth; otherwise keep the default `https`.
 
 `SECRET_SCAN_CMD` is optional. If set, `workspace-sync --commit` runs it before committing and appends the repository path as the final argument.
 

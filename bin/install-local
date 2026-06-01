@@ -14,6 +14,31 @@
 # limitations under the License.
 set -euo pipefail
 
+initial_sync=1
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --no-initial-sync) initial_sync=0 ;;
+    -h|--help)
+      cat <<'EOF'
+Usage: install-local [--no-initial-sync]
+
+Installs local AI workspace helper scripts.
+
+If a configured GITHUB_ORG is already present in ~/.config/ai-workspace/config,
+the installer also runs `workspace-sync --clone-only` to hydrate this machine
+with missing repositories from GitHub. Use --no-initial-sync to skip that phase.
+EOF
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 bin_dir="$HOME/.local/bin"
 config_dir="$HOME/.config/ai-workspace"
@@ -45,3 +70,20 @@ echo
 echo "Enable scheduled sync when ready:"
 echo "  systemctl --user daemon-reload"
 echo "  systemctl --user enable --now ai-workspace-sync.timer"
+
+if [[ "$initial_sync" = "1" ]]; then
+  if [[ -f "$config_dir/config" ]]; then
+    # shellcheck disable=SC1090
+    source "$config_dir/config"
+  fi
+
+  if [[ -n "${GITHUB_ORG:-}" ]]; then
+    echo
+    echo "Initial GitHub project hydration:"
+    "$bin_dir/workspace-sync" --clone-only
+  else
+    echo
+    echo "After setting GITHUB_ORG with workspace-configure, hydrate GitHub projects with:"
+    echo "  workspace-sync --clone-only"
+  fi
+fi

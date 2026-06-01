@@ -15,6 +15,7 @@
 The launcher lists projects from `PROJECT_ROOTS`.
 Scheduled sync includes only `SYNC_ROOTS`.
 Both values are local machine config written by `workspace-configure`.
+GitHub-to-local hydration clones missing repositories from `GITHUB_ORG` into `PROJECTS_HOME`.
 
 ## Project Types
 
@@ -36,6 +37,14 @@ Recommended private organization/account repositories:
 - `dotfiles`
 - one repository per real project
 - optional `project-template`
+
+When `GITHUB_SYNC_REPOS=1`, `workspace-sync` treats the configured GitHub organization/account as another discovery source:
+
+- list repositories with `gh repo list`
+- clone missing repositories into `PROJECTS_HOME`
+- skip paths that already exist
+- never rewrite existing remotes
+- then run the normal local sync policy over `SYNC_ROOTS`
 
 ## Mirror Repositories
 

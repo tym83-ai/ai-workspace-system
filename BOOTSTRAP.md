@@ -40,6 +40,7 @@ Rules:
 - Do not delete local files.
 - Do not force-push.
 - Do not auto-commit dirty repositories.
+- After GitHub CLI auth and local config, clone missing repositories from the configured GitHub org/user into the local project root.
 - Do not enable scheduled sync until you show me what will be enabled.
 - Keep Codex and Claude runtime state out of Git.
 - Use AGENTS.md as the canonical shared project instruction file.
@@ -61,6 +62,7 @@ mkdir -p ~/projects
 git clone <ai-workspace-system-repo-url> ~/projects/ai-workspace-system
 ~/projects/ai-workspace-system/bin/install-local
 workspace-configure
+workspace-sync --clone-only
 ```
 
 Then review:
